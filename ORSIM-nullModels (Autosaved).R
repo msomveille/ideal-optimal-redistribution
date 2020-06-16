@@ -22,7 +22,6 @@ setwd("/Volumes/Marius_SSD/American-Flyway/Connectivity_NAbirds/Redistribution-m
 spp <- c("woothr", "yelwar", "treswa", "swathr", "wlswar", "comyel", "canwar", "amered", "herthr", "kenwar", "amekes", "amerob", "annhum", "comloo", "burowl", "paibun", "westan", "wilfly", "amegfi", "bnhcow", "brnthr", "comgra", "purfin", "rewbla", "whtspa", "buwwar", "gowwar", "ovenbi1", "prowar", "osprey", "barswa", "gocspa", "grycat", "bkpwar")
 
 
-
 ##  Declare objects ##
 
 nullModel.r.all <- list()
@@ -36,6 +35,7 @@ ORSIM.r <- vector()
 # Selected species
 spp_sel1 <- c(1,3,4,6,9,13)
 spp_sel <- spp_sel_all[spp_sel1]
+
 
 # Wood Thrush
 

@@ -511,7 +511,7 @@ winter.abundance <- read.csv(paste("Data/STEMs/seasonalAbundance_", spp[spp_sel[
 ORSIM_results <- read.csv(paste("ORSIM-outputs/ORSIMresults_", spp[spp_sel[3]], ".csv", sep=""), header=FALSE)
 ORSIM_flows <- ORSIM_results[which(summer.abundance>0), which(winter.abundance>0)]
 
-##  Get empirical migration data (location of breeding and wintering sites of individuals) for the species (banding and tracking data for ovenbird)  ##
+##  Get empirical migration data (location of breeding and wintering sites of individuals) for the species (genetic data for yellow warbler)  ##
 wintering.assignments <- readRDS("Data/Genoscapes/YellowWarbler/YWAR_cleaned.rds")
 wintering.assignments <- wintering.assignments[which(wintering.assignments$Stage=="Wintering"),]
 breeding.surfaces.origen <- readRDS("Data/Genoscapes/YellowWarbler/BreedingSurfaces.rds")
@@ -686,141 +686,172 @@ summary(lm(R2 ~ rangeOverlap))  # Test the effect of range overlap
 
 
 
-##  FIGURE S1:  ##
+##  FIGURE S2: Empirical versus simulated migratory connectivity for 6 species: Wood Thrush, Swainson's Thrush, Hermit Thrush, American Robin, American Goldfinch, and Purple Finch  ##
 
+
+# Selected species
 spp_sel1 <- c(1,3,4,6,9,13)
 spp_sel <- spp_sel_all[spp_sel1]
-	
-pdf("Redistribution-model/EMD-outputs/FigS1_mantel.pdf", width=12, height=20)
+
+# Plot the figure
+pdf("Manuscript/Figures/FigS2.pdf", width=12, height=20)
 par(mfrow=c(6,3), mar=c(2,0.1,0.1,0.1), mgp=c(1.9,0.7,0), bg="white")
 
-let <- c("(a)", "(b)", "(c)", "(d)", "(e)", "(f)", "(g)", "(h)", "(i)", "(j)", "(k)", "(l)", "(m)", "(n)", "(o)", "(p)", "(q)", "(r)")
+panel <- c("(a)", "(b)", "(c)", "(d)", "(e)", "(f)", "(g)", "(h)", "(i)", "(j)", "(k)", "(l)", "(m)", "(n)", "(o)", "(p)", "(q)", "(r)")
 
-j=1
-	summer.abundance <- read.csv(paste("Redistribution-model/STEMs/seasonalAbundance_", spp[spp_sel[j]], "_BR.csv", sep=""), header=F)[,1]
-	winter.abundance <- read.csv(paste("Redistribution-model/STEMs/seasonalAbundance_", spp[spp_sel[j]], "_NB.csv", sep=""), header=F)[,1]
-	EMD_results <- read.csv(paste("Redistribution-model/EMD-outputs/EMDresults_", spp[spp_sel[j]], ".csv", sep=""), header=FALSE)
-	EMD_flows <- EMD_results[which(summer.abundance>0), which(winter.abundance>0)]
-	ptsBR <- vector()
-	ptsNB <- vector()
-	if(is.na(spp_banding[spp_sel[j]])==F){
-		bandingData <- read.csv(paste("Redistribution-model/Banding-data/", spp_banding[spp_sel[j]], "_combine.csv", sep=""), header=T)
-		for(i in 1:length(bandingData$GISBLONG)){
-			if(bandingData$B_SEASON[i] == "B"){
-				ptsBR = rbind(ptsBR, c(bandingData$GISBLONG[i], bandingData$GISBLAT[i]))
-			}else{
-				ptsBR = rbind(ptsBR, c(bandingData$GISRLONG[i], bandingData$GISRLAT[i]))
-			}	
-		}
-		for(i in 1:length(bandingData$GISBLONG)){
-			if(bandingData$R_SEASON[i] == "B"){
-				ptsNB = rbind(ptsNB, c(bandingData$GISBLONG[i], bandingData$GISBLAT[i]))
-			}else{
-				ptsNB = rbind(ptsNB, c(bandingData$GISRLONG[i], bandingData$GISRLAT[i]))
-			}	
-		}
-	}
-	if(is.na(spp_tracking[spp_sel[j]])==F){
-		trackingData <- read.csv("Redistribution-model/Tracking-data/data.csv", header=T)
-		trackingData_sel <- trackingData[which(trackingData$species == spp_tracking[spp_sel[j]]),]
-		ptsBR <- rbind(ptsBR, cbind(trackingData_sel$blon, trackingData_sel$blat))
-		ptsNB <- rbind(ptsNB, cbind(trackingData_sel$wlon1, trackingData_sel$wlat1))
-	}
-	dfBR = data.frame(a = 1:length(ptsBR[,1]))
-	sp.ptsBR <- SpatialPointsDataFrame(ptsBR, dfBR)
-	proj4string(sp.ptsBR) <- sr
-	empiricalData_breedingHexagons <- over(sp.ptsBR, hexgrid3_stem[which(summer.abundance>0),])
-	empiricalData_breedingHexagons2 <- unique(empiricalData_breedingHexagons[which(is.na(empiricalData_breedingHexagons)==FALSE)])
-	dfNB = data.frame(a = 1:length(ptsNB[,1]))
-	sp.ptsNB <- SpatialPointsDataFrame(ptsNB, dfNB)
-	proj4string(sp.ptsNB) <- sr
-	empiricalData_nonbreedingHexagons <- over(sp.ptsNB, hexgrid3_stem[which(winter.abundance>0),])
-	empiricalData_nonbreedingHexagons2 <- unique(empiricalData_nonbreedingHexagons[which(is.na(empiricalData_nonbreedingHexagons)==FALSE)])
 
-	toKeep <- which(is.na(empiricalData_breedingHexagons) == F & is.na(empiricalData_nonbreedingHexagons) == F)
-	empiricalData_breedingHexagons3 <- empiricalData_breedingHexagons[toKeep]
-	empiricalData_nonbreedingHexagons3 <- empiricalData_nonbreedingHexagons[toKeep]
-	ptsBR <- ptsBR[toKeep,]
-	ptsNB <- ptsNB[toKeep,]
-	distanceMat.empirical <- vector()
-	for(i in 1:length(empiricalData_breedingHexagons3)){	
-		distanceMat.empirical <- rbind(distanceMat.empirical, distHaversine( hexgrid3_stem_centroids[which(summer.abundance>0),][empiricalData_breedingHexagons3[i],] , hexgrid3_stem_centroids[which(winter.abundance>0),][empiricalData_nonbreedingHexagons3,] ) / 1000)
-	}
-	winter.destinations <- list()
-	EMD_flows_sel <- EMD_flows[empiricalData_breedingHexagons3,]
-	for(i in 1:length(empiricalData_breedingHexagons3)){
-		winter.destinations[[i]] <- hexgrid3_stem_centroids[which(winter.abundance>0),][which(EMD_flows_sel[i,] > 0),]
-		if(length(which(EMD_flows_sel[i,] > 0)) > 1){
-			winter.destinations[[i]] <- apply(winter.destinations[[i]], 2, mean)
-		}
-	}
-	distanceMat.simulatedBR <- vector()
-	for(i in 1:length(empiricalData_breedingHexagons3)){
-		distanceMat.simulatedBR <- rbind(distanceMat.simulatedBR, distHaversine( hexgrid3_stem_centroids[which(summer.abundance>0),][empiricalData_breedingHexagons3[i],] , matrix(unlist(winter.destinations), ncol=2, byrow=T) ) / 1000)
-	}
-	aaa <- which(lapply(winter.destinations, length) == 0)
-	if(length(aaa)>0){
-		empiricalData_breedingHexagons3 <- empiricalData_breedingHexagons3[-aaa]
-		distanceMat.simulatedBR <- distanceMat.simulatedBR[-aaa,]
-		distanceMat.empirical <- distanceMat.empirical[-aaa,-aaa]
-	}
-	
-	#EMD.r2 <- summary(lm(as.vector(distanceMat.simulatedBR) ~ as.vector(distanceMat.empirical)))$r.squared	
-	#nullModel.r2 <- null.r2[[spp_sel1[j]]]
-	
-	EMD.rM <- mantel.rtest(as.dist(distanceMat.simulatedBR, upper=T), as.dist(distanceMat.empirical, upper=T), nrepet=0)
-	
-	# Plots
-	map("world", fill=T, col="grey", border="grey", bg="white", mar=c(0,0,0,0), xlim=c(-180, -20), ylim=c(-15,70))
-	plot(hexgrid3_stem[which(summer.abundance>0),], col="orange", border="orange", add=T)
-	plot(hexgrid3_stem[which(winter.abundance>0),], col="light blue", border="light blue", add=T)
-	plot(hexgrid3_stem[which(summer.abundance>0),][unique(empiricalData_breedingHexagons3),], col="red", border="red", add=T)
-	plot(hexgrid3_stem[which(winter.abundance>0),][unique(empiricalData_nonbreedingHexagons3),], col="blue", border="blue", add=T)
-	for(i in 1:length(ptsBR[,1])){
-		spl = SpatialLines(list(Lines(Line(rbind(ptsBR[i,], ptsNB[i,])),ID="a")), proj4string = CRS(proj4string(hexgrid3_stem)))
-		plot(spl, add=T, col="black", lwd=1.5)
-	}
-	mtext(spp_name[spp_sel[j]], side=1, line=-4, at=-135, cex=1.3)
-	mtext(let[(j+(2*(j-1)))], side=3, line=0.5, at=-175, cex=1.3)
-	title("Empirical connectivity", line=1, cex.main=2.2)
+# Wood Thrush
 
-	map("world", fill=T, col="grey", border="grey", bg="white", mar=c(0,0,0,0), xlim=c(-180, -20), ylim=c(-15,70))
-	plot(hexgrid3_stem[which(summer.abundance>0),], col="orange", border="orange", add=T)
-	plot(hexgrid3_stem[which(winter.abundance>0),], col="light blue", border="light blue", add=T)
-	plot(hexgrid3_stem[which(summer.abundance>0),][unique(empiricalData_breedingHexagons3),], col="red", border="red", add=T)
-	plot(hexgrid3_stem[which(winter.abundance>0),][which(apply(EMD_flows[empiricalData_breedingHexagons3,], 2, sum) > 0),], col="blue", border="blue", add=T)
-	for(i in 1:length(empiricalData_breedingHexagons3)){
-		EMD_flows_sel <- EMD_flows[empiricalData_breedingHexagons3[i],]
-		if(sum(EMD_flows_sel)>0){
-			for(k in 1:length(which(EMD_flows_sel > 0))){
-				spl = SpatialLines(list(Lines(Line(rbind( hexgrid3_stem_centroids[which(winter.abundance>0),][which(EMD_flows_sel > 0)[k],], hexgrid3_stem_centroids[which(summer.abundance>0),][empiricalData_breedingHexagons3[i],] )),ID="a")))
-				plot(spl, add=T, col="black", lwd=1.5, cex=2)
-			}
+j = 1
+
+##  Load species seasonal abundance distributions  ##
+summer.abundance <- read.csv(paste("Data/STEMs/seasonalAbundance_", spp[spp_sel[j]], "_BR.csv", sep=""), header=F)[,1]
+winter.abundance <- read.csv(paste("Data/STEMs/seasonalAbundance_", spp[spp_sel[j]], "_NB.csv", sep=""), header=F)[,1]
+
+##  Load ORSIM output (simulated migratory connectivity)  ##
+ORSIM_results <- read.csv(paste("ORSIM-outputs/ORSIMresults_", spp[spp_sel[j]], ".csv", sep=""), header=FALSE)
+ORSIM_flows <- ORSIM_results[which(summer.abundance>0), which(winter.abundance>0)]
+
+##  Get empirical migration data (location of breeding and wintering sites of individuals) for the species  ##
+ptsBR <- vector()
+ptsNB <- vector()
+# Banding data
+if(is.na(spp_banding[spp_sel[j]])==F){
+	bandingData <- read.csv(paste("Data/Banding-data/", spp_banding[spp_sel[j]], "_combine.csv", sep=""), header=T)
+	for(i in 1:length(bandingData$GISBLONG)){
+		if(bandingData$B_SEASON[i] == "B"){
+			ptsBR = rbind(ptsBR, c(bandingData$GISBLONG[i], bandingData$GISBLAT[i]))
+		}else{
+			ptsBR = rbind(ptsBR, c(bandingData$GISRLONG[i], bandingData$GISRLAT[i]))
 		}	
 	}
-	mtext(let[(j+(2*(j-1))+1)], side=3, line=0.5, at=-175, cex=1.3)
-	title("Simulated connectivity", line=1, cex.main=2.2)
+	for(i in 1:length(bandingData$GISBLONG)){
+		if(bandingData$R_SEASON[i] == "B"){
+			ptsNB = rbind(ptsNB, c(bandingData$GISBLONG[i], bandingData$GISBLAT[i]))
+		}else{
+			ptsNB = rbind(ptsNB, c(bandingData$GISRLONG[i], bandingData$GISRLAT[i]))
+		}	
+	}
+}
+# Tracking data
+if(is.na(spp_tracking[spp_sel[j]])==F){
+	trackingData <- read.csv("Data/Tracking-data/data.csv", header=T)
+	trackingData_sel <- trackingData[which(trackingData$species == spp_tracking[spp_sel[j]]),]
+	ptsBR <- rbind(ptsBR, cbind(trackingData_sel$blon, trackingData_sel$blat))
+	ptsNB <- rbind(ptsNB, cbind(trackingData_sel$wlon1, trackingData_sel$wlat1))
+}
 
-	plot(as.vector(distanceMat.empirical), as.vector(distanceMat.simulatedBR), pch=20, cex=0.8, axes=F, main=NULL, ylab="Simulated", xlab="Empirical", xlim=c(0,7000), ylim=c(0,7000), cex.lab=1.5)
-	axis(side=1)
-	axis(side=2)
-	abline(lm(as.vector(distanceMat.simulatedBR) ~ as.vector(distanceMat.empirical)), col="red", lwd=2)
-	mtext(let[(j+(2*(j-1))+2)], side=3, line=0.5, at=-500, cex=1.3)
-	mtext(bquote('r'["M"]*' = '* .(round(EMD.rM,3))), side=1, line=-1.3, at=5700, cex=1.4)
-	title("Simulated vs. empirical", line=1, cex.main=2.2)	
+##  Get hexagons containing the empirical breeding and wintering locations of individuals  ## 
+dfBR = data.frame(a = 1:length(ptsBR[,1]))
+sp.ptsBR <- SpatialPointsDataFrame(ptsBR, dfBR)
+proj4string(sp.ptsBR) <- sr
+empiricalData_breedingHexagons <- over(sp.ptsBR, hexgrid3_stem[which(summer.abundance>0),])
+empiricalData_breedingHexagons2 <- unique(empiricalData_breedingHexagons[which(is.na(empiricalData_breedingHexagons)==FALSE)])
+dfNB = data.frame(a = 1:length(ptsNB[,1]))
+sp.ptsNB <- SpatialPointsDataFrame(ptsNB, dfNB)
+proj4string(sp.ptsNB) <- sr
+empiricalData_nonbreedingHexagons <- over(sp.ptsNB, hexgrid3_stem[which(winter.abundance>0),])
+empiricalData_nonbreedingHexagons2 <- unique(empiricalData_nonbreedingHexagons[which(is.na(empiricalData_nonbreedingHexagons)==FALSE)])
 
+##  Only keep individuals for which both breeding and wintering locations fall within an hexagon occupied by the species (i.e. with a seasonal relative abundance > 0) ##
+toKeep <- which(is.na(empiricalData_breedingHexagons) == F & is.na(empiricalData_nonbreedingHexagons) == F)
+empiricalData_breedingHexagons3 <- empiricalData_breedingHexagons[toKeep]
+empiricalData_nonbreedingHexagons3 <- empiricalData_nonbreedingHexagons[toKeep]
+ptsBR <- ptsBR[toKeep,]
+ptsNB <- ptsNB[toKeep,]
 
+##  Compute pairwise distances between the sets of breeding and wintering locations of individuals in the empirical dataset  ##
+distanceMat.empirical <- vector() 
+for(i in 1:length(empiricalData_breedingHexagons3)){	
+	distanceMat.empirical <- rbind(distanceMat.empirical, distHaversine( hexgrid3_stem_centroids[which(summer.abundance>0),][empiricalData_breedingHexagons3[i],] , hexgrid3_stem_centroids[which(winter.abundance>0),][empiricalData_nonbreedingHexagons3,] ) / 1000)
+}
+
+##  Get wintering sites (hexagon) where simulated individuals from the empirical breeding sites (hexagons containing empirical breeding locations) are predicted to migrate  ##
+winter.destinations <- list()
+ORSIM_flows_sel <- ORSIM_flows[empiricalData_breedingHexagons3,]
+for(i in 1:length(empiricalData_breedingHexagons3)){
+	winter.destinations[[i]] <- hexgrid3_stem_centroids[which(winter.abundance>0),][which(ORSIM_flows_sel[i,] > 0),]
+	if(length(which(ORSIM_flows_sel[i,] > 0)) > 1){
+		winter.destinations[[i]] <- apply(winter.destinations[[i]], 2, mean)
+	}
+}
+
+##  Compute pairwise distances between empirical breeding sites and corresponding simulated wintering sites  ##
+distanceMat.simulatedBR <- vector()
+for(i in 1:length(empiricalData_breedingHexagons3)){
+	distanceMat.simulatedBR <- rbind(distanceMat.simulatedBR, distHaversine( hexgrid3_stem_centroids[which(summer.abundance>0),][empiricalData_breedingHexagons3[i],] , matrix(unlist(winter.destinations), ncol=2, byrow=T) ) / 1000)
+}
+aaa <- which(lapply(winter.destinations, length) == 0)
+if(length(aaa)>0){
+	empiricalData_breedingHexagons3 <- empiricalData_breedingHexagons3[-aaa]
+	distanceMat.simulatedBR <- distanceMat.simulatedBR[-aaa,]
+	distanceMat.empirical <- distanceMat.empirical[-aaa,-aaa]
+}
+
+##  Compute the Mantel correlation coefficient	##
+ORSIM.rM <- mantel.rtest(as.dist(distanceMat.simulatedBR, upper=T), as.dist(distanceMat.empirical, upper=T), nrepet=0)
+	
+##  Plot the figure for this species  ##
+# Empirical migratory connectivity
+map("world", fill=T, col="grey", border="grey", bg="white", mar=c(0,0,0,0), xlim=c(-180, -20), ylim=c(-15,70))
+plot(hexgrid3_stem[which(summer.abundance>0),], col="orange", border="orange", add=T)
+plot(hexgrid3_stem[which(winter.abundance>0),], col="light blue", border="light blue", add=T)
+plot(hexgrid3_stem[which(summer.abundance>0),][unique(empiricalData_breedingHexagons3),], col="red", border="red", add=T)
+plot(hexgrid3_stem[which(winter.abundance>0),][unique(empiricalData_nonbreedingHexagons3),], col="blue", border="blue", add=T)
+for(i in 1:length(ptsBR[,1])){
+	spl = SpatialLines(list(Lines(Line(rbind(ptsBR[i,], ptsNB[i,])),ID="a")), proj4string = CRS(proj4string(hexgrid3_stem)))
+	plot(spl, add=T, col="black", lwd=1.5)
+}
+mtext(spp_name[spp_sel[j]], side=1, line=-4, at=-135, cex=1.3)
+mtext(panel[(j+(2*(j-1)))], side=3, line=0.5, at=-175, cex=1.3)
+title("Empirical connectivity", line=1, cex.main=2.2)
+
+# Simulated migratory connectivity
+map("world", fill=T, col="grey", border="grey", bg="white", mar=c(0,0,0,0), xlim=c(-180, -20), ylim=c(-15,70))
+plot(hexgrid3_stem[which(summer.abundance>0),], col="orange", border="orange", add=T)
+plot(hexgrid3_stem[which(winter.abundance>0),], col="light blue", border="light blue", add=T)
+plot(hexgrid3_stem[which(summer.abundance>0),][unique(empiricalData_breedingHexagons3),], col="red", border="red", add=T)
+plot(hexgrid3_stem[which(winter.abundance>0),][which(apply(ORSIM_flows[empiricalData_breedingHexagons3,], 2, sum) > 0),], col="blue", border="blue", add=T)
+for(i in 1:length(empiricalData_breedingHexagons3)){
+	ORSIM_flows_sel <- ORSIM_flows[empiricalData_breedingHexagons3[i],]
+	if(sum(ORSIM_flows_sel)>0){
+		for(k in 1:length(which(ORSIM_flows_sel > 0))){
+			spl = SpatialLines(list(Lines(Line(rbind( hexgrid3_stem_centroids[which(winter.abundance>0),][which(ORSIM_flows_sel > 0)[k],], hexgrid3_stem_centroids[which(summer.abundance>0),][empiricalData_breedingHexagons3[i],] )),ID="a")))
+			plot(spl, add=T, col="black", lwd=1.5, cex=2)
+		}
+	}	
+}
+mtext(panel[(j+(2*(j-1))+1)], side=3, line=0.5, at=-175, cex=1.3)
+title("Simulated connectivity", line=1, cex.main=2.2)
+
+# Simulated versus empirical
+plot(as.vector(distanceMat.empirical), as.vector(distanceMat.simulatedBR), pch=20, cex=0.8, axes=F, main=NULL, ylab="Simulated", xlab="Empirical", xlim=c(0,7000), ylim=c(0,7000), cex.lab=1.5)
+axis(side=1)
+axis(side=2)
+abline(lm(as.vector(distanceMat.simulatedBR) ~ as.vector(distanceMat.empirical)), col="red", lwd=2)
+mtext(panel[(j+(2*(j-1))+2)], side=3, line=0.5, at=-500, cex=1.3)
+mtext(bquote('r'["M"]*' = '* .(round(ORSIM.rM,3))), side=1, line=-1.3, at=5700, cex=1.4)
+title("Simulated vs. empirical", line=1, cex.main=2.2)	
+
+	
+# Swainson's Thrush, Hermit Thrush, American Robin, American Goldfinch, and Purple Finch
 
 for(j in 2:length(spp_sel)){
 
-	summer.abundance <- read.csv(paste("Redistribution-model/STEMs/seasonalAbundance_", spp[spp_sel[j]], "_BR.csv", sep=""), header=F)[,1]
-	winter.abundance <- read.csv(paste("Redistribution-model/STEMs/seasonalAbundance_", spp[spp_sel[j]], "_NB.csv", sep=""), header=F)[,1]
-	EMD_results <- read.csv(paste("Redistribution-model/EMD-outputs/EMDresults_", spp[spp_sel[j]], ".csv", sep=""), header=FALSE)
-	EMD_flows <- EMD_results[which(summer.abundance>0), which(winter.abundance>0)]
+	##  Load species seasonal abundance distributions  ##
+	summer.abundance <- read.csv(paste("Data/STEMs/seasonalAbundance_", spp[spp_sel[j]], "_BR.csv", sep=""), header=F)[,1]
+	winter.abundance <- read.csv(paste("Data/STEMs/seasonalAbundance_", spp[spp_sel[j]], "_NB.csv", sep=""), header=F)[,1]
+
+	##  Load ORSIM output (simulated migratory connectivity)  ##
+	ORSIM_results <- read.csv(paste("ORSIM-outputs/ORSIMresults_", spp[spp_sel[j]], ".csv", sep=""), header=FALSE)
+	ORSIM_flows <- ORSIM_results[which(summer.abundance>0), which(winter.abundance>0)]
+
+	##  Get empirical migration data (location of breeding and wintering sites of individuals) for the species  ##
 	ptsBR <- vector()
 	ptsNB <- vector()
+	# Banding data
 	if(is.na(spp_banding[spp_sel[j]])==F){
-		bandingData <- read.csv(paste("Redistribution-model/Banding-data/", spp_banding[spp_sel[j]], "_combine.csv", sep=""), header=T)
+		bandingData <- read.csv(paste("Data/Banding-data/", spp_banding[spp_sel[j]], "_combine.csv", sep=""), header=T)
 		for(i in 1:length(bandingData$GISBLONG)){
 			if(bandingData$B_SEASON[i] == "B"){
 				ptsBR = rbind(ptsBR, c(bandingData$GISBLONG[i], bandingData$GISBLAT[i]))
@@ -836,12 +867,15 @@ for(j in 2:length(spp_sel)){
 			}	
 		}
 	}
+	# Tracking data
 	if(is.na(spp_tracking[spp_sel[j]])==F){
-		trackingData <- read.csv("Redistribution-model/Tracking-data/data.csv", header=T)
+		trackingData <- read.csv("Data/Tracking-data/data.csv", header=T)
 		trackingData_sel <- trackingData[which(trackingData$species == spp_tracking[spp_sel[j]]),]
 		ptsBR <- rbind(ptsBR, cbind(trackingData_sel$blon, trackingData_sel$blat))
 		ptsNB <- rbind(ptsNB, cbind(trackingData_sel$wlon1, trackingData_sel$wlat1))
 	}
+
+	##  Get hexagons containing the empirical breeding and wintering locations of individuals  ## 
 	dfBR = data.frame(a = 1:length(ptsBR[,1]))
 	sp.ptsBR <- SpatialPointsDataFrame(ptsBR, dfBR)
 	proj4string(sp.ptsBR) <- sr
@@ -853,23 +887,30 @@ for(j in 2:length(spp_sel)){
 	empiricalData_nonbreedingHexagons <- over(sp.ptsNB, hexgrid3_stem[which(winter.abundance>0),])
 	empiricalData_nonbreedingHexagons2 <- unique(empiricalData_nonbreedingHexagons[which(is.na(empiricalData_nonbreedingHexagons)==FALSE)])
 
+	##  Only keep individuals for which both breeding and wintering locations fall within an hexagon occupied by the species (i.e. with a seasonal relative abundance > 0) ##
 	toKeep <- which(is.na(empiricalData_breedingHexagons) == F & is.na(empiricalData_nonbreedingHexagons) == F)
 	empiricalData_breedingHexagons3 <- empiricalData_breedingHexagons[toKeep]
 	empiricalData_nonbreedingHexagons3 <- empiricalData_nonbreedingHexagons[toKeep]
 	ptsBR <- ptsBR[toKeep,]
 	ptsNB <- ptsNB[toKeep,]
-	distanceMat.empirical <- vector()
+
+	##  Compute pairwise distances between the sets of breeding and wintering locations of individuals in the empirical dataset  ##
+	distanceMat.empirical <- vector() 
 	for(i in 1:length(empiricalData_breedingHexagons3)){	
-		distanceMat.empirical <- rbind(distanceMat.empirical, distHaversine( hexgrid3_stem_centroids[which(summer.abundance>0),][empiricalData_breedingHexagons3[i],] , hexgrid3_stem_centroids[which(winter.abundance>0),][empiricalData_nonbreedingHexagons3,] ) / 1000)
+		distanceMat.empirical <- rbind(distanceMat.empirical, distHaversine( hexgrid3_stem_centroids[which(summer.abundance>0),][empiricalData_breedingHexagons3[i],] , 	hexgrid3_stem_centroids[which(winter.abundance>0),][empiricalData_nonbreedingHexagons3,] ) / 1000)
 	}
+
+	##  Get wintering sites (hexagon) where simulated individuals from the empirical breeding sites (hexagons containing empirical breeding locations) are predicted to migrate  ##
 	winter.destinations <- list()
-	EMD_flows_sel <- EMD_flows[empiricalData_breedingHexagons3,]
+	ORSIM_flows_sel <- ORSIM_flows[empiricalData_breedingHexagons3,]
 	for(i in 1:length(empiricalData_breedingHexagons3)){
-		winter.destinations[[i]] <- hexgrid3_stem_centroids[which(winter.abundance>0),][which(EMD_flows_sel[i,] > 0),]
-		if(length(which(EMD_flows_sel[i,] > 0)) > 1){
+		winter.destinations[[i]] <- hexgrid3_stem_centroids[which(winter.abundance>0),][which(ORSIM_flows_sel[i,] > 0),]
+		if(length(which(ORSIM_flows_sel[i,] > 0)) > 1){
 			winter.destinations[[i]] <- apply(winter.destinations[[i]], 2, mean)
 		}
 	}
+
+	##  Compute pairwise distances between empirical breeding sites and corresponding simulated wintering sites  ##
 	distanceMat.simulatedBR <- vector()
 	for(i in 1:length(empiricalData_breedingHexagons3)){
 		distanceMat.simulatedBR <- rbind(distanceMat.simulatedBR, distHaversine( hexgrid3_stem_centroids[which(summer.abundance>0),][empiricalData_breedingHexagons3[i],] , matrix(unlist(winter.destinations), ncol=2, byrow=T) ) / 1000)
@@ -880,13 +921,12 @@ for(j in 2:length(spp_sel)){
 		distanceMat.simulatedBR <- distanceMat.simulatedBR[-aaa,]
 		distanceMat.empirical <- distanceMat.empirical[-aaa,-aaa]
 	}
-	
-	#EMD.r2 <- summary(lm(as.vector(distanceMat.simulatedBR) ~ as.vector(distanceMat.empirical)))$r.squared
-	#nullModel.r2 <- null.r2[[spp_sel1[j]]]
 
-	EMD.rM <- mantel.rtest(as.dist(distanceMat.simulatedBR, upper=T), as.dist(distanceMat.empirical, upper=T), nrepet=0)
+	##  Compute the Mantel correlation coefficient	##
+	ORSIM.rM <- mantel.rtest(as.dist(distanceMat.simulatedBR, upper=T), as.dist(distanceMat.empirical, upper=T), nrepet=0)
 	
-	# Plots
+	##  Plot the figure for this species  ##
+	# Empirical migratory connectivity
 	map("world", fill=T, col="grey", border="grey", bg="white", mar=c(0,0,0,0), xlim=c(-180, -20), ylim=c(-15,70))
 	plot(hexgrid3_stem[which(summer.abundance>0),], col="orange", border="orange", add=T)
 	plot(hexgrid3_stem[which(winter.abundance>0),], col="light blue", border="light blue", add=T)
@@ -897,31 +937,32 @@ for(j in 2:length(spp_sel)){
 		plot(spl, add=T, col="black", lwd=1.5)
 	}
 	mtext(spp_name[spp_sel[j]], side=1, line=-4, at=-135, cex=1.3)
-	mtext(let[(j+(2*(j-1)))], side=3, line=0.5, at=-175, cex=1.3)
+	mtext(panel[(j+(2*(j-1)))], side=3, line=0.5, at=-175, cex=1.3)
 
+	# Simulated migratory connectivity
 	map("world", fill=T, col="grey", border="grey", bg="white", mar=c(0,0,0,0), xlim=c(-180, -20), ylim=c(-15,70))
 	plot(hexgrid3_stem[which(summer.abundance>0),], col="orange", border="orange", add=T)
 	plot(hexgrid3_stem[which(winter.abundance>0),], col="light blue", border="light blue", add=T)
 	plot(hexgrid3_stem[which(summer.abundance>0),][unique(empiricalData_breedingHexagons3),], col="red", border="red", add=T)
-	plot(hexgrid3_stem[which(winter.abundance>0),][which(apply(EMD_flows[empiricalData_breedingHexagons3,], 2, sum) > 0),], col="blue", border="blue", add=T)
+	plot(hexgrid3_stem[which(winter.abundance>0),][which(apply(ORSIM_flows[empiricalData_breedingHexagons3,], 2, sum) > 0),], col="blue", border="blue", add=T)
 	for(i in 1:length(empiricalData_breedingHexagons3)){
-		EMD_flows_sel <- EMD_flows[empiricalData_breedingHexagons3[i],]
-		if(sum(EMD_flows_sel)>0){
-			for(k in 1:length(which(EMD_flows_sel > 0))){
-				spl = SpatialLines(list(Lines(Line(rbind( hexgrid3_stem_centroids[which(winter.abundance>0),][which(EMD_flows_sel > 0)[k],], hexgrid3_stem_centroids[which(summer.abundance>0),][empiricalData_breedingHexagons3[i],] )),ID="a")))
+		ORSIM_flows_sel <- ORSIM_flows[empiricalData_breedingHexagons3[i],]
+		if(sum(ORSIM_flows_sel)>0){
+			for(k in 1:length(which(ORSIM_flows_sel > 0))){
+				spl = SpatialLines(list(Lines(Line(rbind( hexgrid3_stem_centroids[which(winter.abundance>0),][which(ORSIM_flows_sel > 0)[k],], hexgrid3_stem_centroids[which(summer.abundance>0),][empiricalData_breedingHexagons3[i],] )),ID="a")))
 				plot(spl, add=T, col="black", lwd=1.5, cex=2)
 			}
 		}	
 	}
-	mtext(let[(j+(2*(j-1))+1)], side=3, line=0.5, at=-175, cex=1.3)
+	mtext(panel[(j+(2*(j-1))+1)], side=3, line=0.5, at=-175, cex=1.3)
 
+	# Simulated versus empirical
 	plot(as.vector(distanceMat.empirical), as.vector(distanceMat.simulatedBR), pch=20, cex=0.8, axes=F, main=NULL, ylab="Simulated", xlab="Empirical", xlim=c(0,7000), ylim=c(0,7000), cex.lab=1.5)
 	axis(side=1)
 	axis(side=2)
 	abline(lm(as.vector(distanceMat.simulatedBR) ~ as.vector(distanceMat.empirical)), col="red", lwd=2)
-	mtext(let[(j+(2*(j-1))+2)], side=3, line=0.5, at=-500, cex=1.3)
-	mtext(bquote('r'["M"]*' = '* .(round(EMD.rM,3))), side=1, line=-1.3, at=5700, cex=1.4)
-
+	mtext(panel[(j+(2*(j-1))+2)], side=3, line=0.5, at=-500, cex=1.3)
+	mtext(bquote('r'["M"]*' = '* .(round(ORSIM.rM,3))), side=1, line=-1.3, at=5700, cex=1.4)	
 }
 dev.off()	
 	
@@ -929,462 +970,547 @@ dev.off()
 	
 
 
-##  Figure S2  ##
+##  FIGURE S3: Empirical versus simulated migratory connectivity for 6 species: Yellow Warbler, Common Yellowthroat, Wilson's Warbler, Blue winged Warbler, Ovenbird, and White-throated Sparrow  ##
 
+
+# Selected species
 spp_sel1 <- c(20,26,28,22,16,15)
 spp_sel <- spp_sel_all[spp_sel1]
 	
-pdf("Redistribution-model/EMD-outputs/FigS2_mantel.pdf", width=12, height=20)
+# Plot the figure
+pdf("Manuscript/Figures/FigS3.pdf", width=12, height=20)
 par(mfrow=c(6,3), mar=c(2,0.1,0.1,0.1), mgp=c(1.9,0.7,0), bg="white")
 
-j=1
-	summer.abundance <- read.csv(paste("Redistribution-model/STEMs/seasonalAbundance_", spp[spp_sel[j]], "_BR.csv", sep=""), header=F)[,1]
-	winter.abundance <- read.csv(paste("Redistribution-model/STEMs/seasonalAbundance_", spp[spp_sel[j]], "_NB.csv", sep=""), header=F)[,1]
-	EMD_results <- read.csv(paste("Redistribution-model/EMD-outputs/EMDresults_", spp[spp_sel[j]], ".csv", sep=""), header=FALSE)
-	EMD_flows <- EMD_results[which(summer.abundance>0), which(winter.abundance>0)]
+panel <- c("(a)", "(b)", "(c)", "(d)", "(e)", "(f)", "(g)", "(h)", "(i)", "(j)", "(k)", "(l)", "(m)", "(n)", "(o)", "(p)", "(q)", "(r)")
+
+
+# Yellow Warbler
+
+j = 1
+
+##  Load species seasonal abundance distributions  ##
+summer.abundance <- read.csv(paste("Data/STEMs/seasonalAbundance_", spp[spp_sel[j]], "_BR.csv", sep=""), header=F)[,1]
+winter.abundance <- read.csv(paste("Data/STEMs/seasonalAbundance_", spp[spp_sel[j]], "_NB.csv", sep=""), header=F)[,1]
+
+##  Load ORSIM output (simulated migratory connectivity)  ##
+ORSIM_results <- read.csv(paste("ORSIM-outputs/ORSIMresults_", spp[spp_sel[j]], ".csv", sep=""), header=FALSE)
+ORSIM_flows <- ORSIM_results[which(summer.abundance>0), which(winter.abundance>0)]
 	
-	wintering.assignments <- readRDS("Redistribution-model/Genoscapes/YellowWarbler/YWAR_cleaned.rds")
-	wintering.assignments <- wintering.assignments[which(wintering.assignments$Stage=="Wintering"),]
-	breeding.surfaces.origen <- readRDS("Redistribution-model/Genoscapes/YellowWarbler/BreedingSurfaces.rds")
-	wintering.surfaces.origen <- readRDS("Redistribution-model/Genoscapes/YellowWarbler/WinterProbSurfaces.rds")
-
-	# Get hexagons for genoscapes breeding and wintering destinations 
-	breeding_origen <- vector()
-	for(k in 3:length(colnames(wintering.surfaces.origen))){
-		breeding_origen[k] <- which(wintering.surfaces.origen[,k] == max(wintering.surfaces.origen[,k]))
+##  Get empirical migration data (location of breeding and wintering sites of individuals) for the species (genetic data for yellow warbler)  ##
+wintering.assignments <- readRDS("Data/Genoscapes/YellowWarbler/YWAR_cleaned.rds")
+wintering.assignments <- wintering.assignments[which(wintering.assignments$Stage=="Wintering"),]
+breeding.surfaces.origen <- readRDS("Data/Genoscapes/YellowWarbler/BreedingSurfaces.rds")
+wintering.surfaces.origen <- readRDS("Data/Genoscapes/YellowWarbler/WinterProbSurfaces.rds") 
+breeding_origen <- vector()
+for(k in 3:length(colnames(wintering.surfaces.origen))){
+	breeding_origen[k] <- which(wintering.surfaces.origen[,k] == max(wintering.surfaces.origen[,k]))
+}
+breeding_origen <- breeding_origen[-c(1,2)]
+wintering_origen <- vector()
+for(k in 3:length(colnames(wintering.surfaces.origen))){
+	if(length(which(wintering.assignments$Sample == colnames(wintering.surfaces.origen)[k])) > 0){
+		wintering_origen[k] <- which(wintering.assignments$Sample == colnames(wintering.surfaces.origen)[k])
+	}else{
+		wintering_origen[k] <- NA
 	}
-	breeding_origen <- breeding_origen[-c(1,2)]
-	wintering_origen <- vector()
-	for(k in 3:length(colnames(wintering.surfaces.origen))){
-		if(length(which(wintering.assignments$Sample == colnames(wintering.surfaces.origen)[k])) > 0){
-			wintering_origen[k] <- which(wintering.assignments$Sample == colnames(wintering.surfaces.origen)[k])
-		}else{
-			wintering_origen[k] <- NA
-		}
-	}
-	wintering_origen <- wintering_origen[-c(1,2)]
-	toRemove <- which(is.na(wintering_origen) == T)
-	wintering_origen <- wintering_origen[-toRemove]
-	breeding_origen <- breeding_origen[-toRemove]
+}
+wintering_origen <- wintering_origen[-c(1,2)]
+toRemove <- which(is.na(wintering_origen) == T)
+wintering_origen <- wintering_origen[-toRemove]
+breeding_origen <- breeding_origen[-toRemove]
 
-	ptsBR = wintering.surfaces.origen[,1:2][breeding_origen,]
-	sptsBR <- SpatialPoints(ptsBR)
-	proj4string(sptsBR) <- proj4string(hexgrid3_stem)
-	breedingPoints_inHexagons <- gContains(hexgrid3_stem[which(summer.abundance>0),], sptsBR, byid=T)
-	breedingHexagons <- apply(breedingPoints_inHexagons, 1, function(x) which(x==TRUE))
+##  Get hexagons containing the empirical breeding and wintering locations of individuals  ## 
+ptsBR = wintering.surfaces.origen[,1:2][breeding_origen,]
+sptsBR <- SpatialPoints(ptsBR)
+proj4string(sptsBR) <- proj4string(hexgrid3_stem)
+breedingPoints_inHexagons <- gContains(hexgrid3_stem[which(summer.abundance>0),], sptsBR, byid=T)
+breedingHexagons <- apply(breedingPoints_inHexagons, 1, function(x) which(x==TRUE))
 
-	ptsNB <- as.matrix(wintering.assignments[,3:4][wintering_origen,])
-	sptsNB <- SpatialPoints(ptsNB)
-	proj4string(sptsNB) <- proj4string(hexgrid3_stem)
-	winteringPoints_inHexagons <- gContains(hexgrid3_stem[which(winter.abundance>0),], sptsNB, byid=T)
-	winteringHexagons <- apply(winteringPoints_inHexagons, 1, function(x) which(x==TRUE))
+ptsNB <- as.matrix(wintering.assignments[,3:4][wintering_origen,])
+sptsNB <- SpatialPoints(ptsNB)
+proj4string(sptsNB) <- proj4string(hexgrid3_stem)
+winteringPoints_inHexagons <- gContains(hexgrid3_stem[which(winter.abundance>0),], sptsNB, byid=T)
+winteringHexagons <- apply(winteringPoints_inHexagons, 1, function(x) which(x==TRUE))
 
-	toKeep <- which(lapply(breedingHexagons, length) > 0 & lapply(winteringHexagons, length) > 0)
-	empiricalData_breedingHexagons <- unlist(breedingHexagons[toKeep])
-	empiricalData_nonbreedingHexagons <- unlist(winteringHexagons[toKeep])
-	empiricalData_breedingHexagons2 <- unique(empiricalData_breedingHexagons)
-	empiricalData_nonbreedingHexagons2 <- unique(empiricalData_nonbreedingHexagons)
-	ptsBR <- ptsBR[toKeep,]
-	ptsNB <- ptsNB[toKeep,]
+toKeep <- which(lapply(breedingHexagons, length) > 0 & lapply(winteringHexagons, length) > 0)
+empiricalData_breedingHexagons <- unlist(breedingHexagons[toKeep])
+empiricalData_nonbreedingHexagons <- unlist(winteringHexagons[toKeep])
+empiricalData_breedingHexagons2 <- unique(empiricalData_breedingHexagons)
+empiricalData_nonbreedingHexagons2 <- unique(empiricalData_nonbreedingHexagons)
+ptsBR <- ptsBR[toKeep,]
+ptsNB <- ptsNB[toKeep,]
 	
-	toKeep <- which(is.na(empiricalData_breedingHexagons) == F & is.na(empiricalData_nonbreedingHexagons) == F)
-	empiricalData_breedingHexagons3 <- empiricalData_breedingHexagons[toKeep]
-	empiricalData_nonbreedingHexagons3 <- empiricalData_nonbreedingHexagons[toKeep]
-	ptsBR <- ptsBR[toKeep,]
-	ptsNB <- ptsNB[toKeep,]
-	distanceMat.empirical <- vector()
-	for(i in 1:length(empiricalData_breedingHexagons3)){	
-		distanceMat.empirical <- rbind(distanceMat.empirical, distHaversine( hexgrid3_stem_centroids[which(summer.abundance>0),][empiricalData_breedingHexagons3[i],] , hexgrid3_stem_centroids[which(winter.abundance>0),][empiricalData_nonbreedingHexagons3,] ) / 1000)
+##  Only keep individuals for which both breeding and wintering locations fall within an hexagon occupied by the species (i.e. with a seasonal relative abundance > 0) ##
+toKeep <- which(is.na(empiricalData_breedingHexagons) == F & is.na(empiricalData_nonbreedingHexagons) == F)
+empiricalData_breedingHexagons3 <- empiricalData_breedingHexagons[toKeep]
+empiricalData_nonbreedingHexagons3 <- empiricalData_nonbreedingHexagons[toKeep]
+ptsBR <- ptsBR[toKeep,]
+ptsNB <- ptsNB[toKeep,]
+
+##  Compute pairwise distances between the sets of breeding and wintering locations of individuals in the empirical dataset  ##
+distanceMat.empirical <- vector() 
+for(i in 1:length(empiricalData_breedingHexagons3)){	
+	distanceMat.empirical <- rbind(distanceMat.empirical, distHaversine( hexgrid3_stem_centroids[which(summer.abundance>0),][empiricalData_breedingHexagons3[i],] , hexgrid3_stem_centroids[which(winter.abundance>0),][empiricalData_nonbreedingHexagons3,] ) / 1000)
+}
+
+##  Get wintering sites (hexagon) where simulated individuals from the empirical breeding sites (hexagons containing empirical breeding locations) are predicted to migrate  ##
+winter.destinations <- list()
+ORSIM_flows_sel <- ORSIM_flows[empiricalData_breedingHexagons3,]
+for(i in 1:length(empiricalData_breedingHexagons3)){
+	winter.destinations[[i]] <- hexgrid3_stem_centroids[which(winter.abundance>0),][which(ORSIM_flows_sel[i,] > 0),]
+	if(length(which(ORSIM_flows_sel[i,] > 0)) > 1){
+		winter.destinations[[i]] <- apply(winter.destinations[[i]], 2, mean)
 	}
-	winter.destinations <- list()
-	EMD_flows_sel <- EMD_flows[empiricalData_breedingHexagons3,]
-	for(i in 1:length(empiricalData_breedingHexagons3)){
-		winter.destinations[[i]] <- hexgrid3_stem_centroids[which(winter.abundance>0),][which(EMD_flows_sel[i,] > 0),]
-		if(length(which(EMD_flows_sel[i,] > 0)) > 1){
-			winter.destinations[[i]] <- apply(winter.destinations[[i]], 2, mean)
-		}
-	}
-	distanceMat.simulatedBR <- vector()
-	for(i in 1:length(empiricalData_breedingHexagons3)){
-		distanceMat.simulatedBR <- rbind(distanceMat.simulatedBR, distHaversine( hexgrid3_stem_centroids[which(summer.abundance>0),][empiricalData_breedingHexagons3[i],] , matrix(unlist(winter.destinations), ncol=2, byrow=T) ) / 1000)
-	}
-	aaa <- which(lapply(winter.destinations, length) == 0)
-	if(length(aaa)>0){
-		empiricalData_breedingHexagons3 <- empiricalData_breedingHexagons3[-aaa]
-		distanceMat.simulatedBR <- distanceMat.simulatedBR[-aaa,]
-		distanceMat.empirical <- distanceMat.empirical[-aaa,-aaa]
-	}
+}
+
+##  Compute pairwise distances between empirical breeding sites and corresponding simulated wintering sites  ##
+distanceMat.simulatedBR <- vector()
+for(i in 1:length(empiricalData_breedingHexagons3)){
+	distanceMat.simulatedBR <- rbind(distanceMat.simulatedBR, distHaversine( hexgrid3_stem_centroids[which(summer.abundance>0),][empiricalData_breedingHexagons3[i],] , matrix(unlist(winter.destinations), ncol=2, byrow=T) ) / 1000)
+}
+aaa <- which(lapply(winter.destinations, length) == 0)
+if(length(aaa)>0){
+	empiricalData_breedingHexagons3 <- empiricalData_breedingHexagons3[-aaa]
+	distanceMat.simulatedBR <- distanceMat.simulatedBR[-aaa,]
+	distanceMat.empirical <- distanceMat.empirical[-aaa,-aaa]
+}
+
+##  Compute the Mantel correlation coefficient	##
+ORSIM.rM <- mantel.rtest(as.dist(distanceMat.simulatedBR, upper=T), as.dist(distanceMat.empirical, upper=T), nrepet=0)
 	
-	#EMD.r2 <- summary(lm(as.vector(distanceMat.simulatedBR) ~ as.vector(distanceMat.empirical)))$r.squared	
-	#nullModel.r2 <- null.r2[[spp_sel1[j]]]
-	
-	EMD.rM <- mantel.rtest(as.dist(distanceMat.simulatedBR, upper=T), as.dist(distanceMat.empirical, upper=T), nrepet=0)
-	
-	# Plots
-	map("world", fill=T, col="grey", border="grey", bg="white", mar=c(0,0,0,0), xlim=c(-180, -20), ylim=c(-15,70))
-	plot(hexgrid3_stem[which(summer.abundance>0),], col="orange", border="orange", add=T)
-	plot(hexgrid3_stem[which(winter.abundance>0),], col="light blue", border="light blue", add=T)
-	plot(hexgrid3_stem[which(summer.abundance>0),][unique(empiricalData_breedingHexagons3),], col="red", border="red", add=T)
-	plot(hexgrid3_stem[which(winter.abundance>0),][unique(empiricalData_nonbreedingHexagons3),], col="blue", border="blue", add=T)
-	for(i in 1:length(ptsBR[,1])){
-		spl = SpatialLines(list(Lines(Line(rbind(ptsBR[i,], ptsNB[i,])),ID="a")), proj4string = CRS(proj4string(hexgrid3_stem)))
-		plot(spl, add=T, col="black", lwd=1.5)
-	}
-	mtext(spp_name[spp_sel[j]], side=1, line=-4, at=-135, cex=1.3)
-	mtext(let[(j+(2*(j-1)))], side=3, line=0.5, at=-175, cex=1.3)
-	title("Empirical connectivity", line=1, cex.main=2.2)
+##  Plot the figure for this species  ##
+# Empirical migratory connectivity
+map("world", fill=T, col="grey", border="grey", bg="white", mar=c(0,0,0,0), xlim=c(-180, -20), ylim=c(-15,70))
+plot(hexgrid3_stem[which(summer.abundance>0),], col="orange", border="orange", add=T)
+plot(hexgrid3_stem[which(winter.abundance>0),], col="light blue", border="light blue", add=T)
+plot(hexgrid3_stem[which(summer.abundance>0),][unique(empiricalData_breedingHexagons3),], col="red", border="red", add=T)
+plot(hexgrid3_stem[which(winter.abundance>0),][unique(empiricalData_nonbreedingHexagons3),], col="blue", border="blue", add=T)
+for(i in 1:length(ptsBR[,1])){
+	spl = SpatialLines(list(Lines(Line(rbind(ptsBR[i,], ptsNB[i,])),ID="a")), proj4string = CRS(proj4string(hexgrid3_stem)))
+	plot(spl, add=T, col="black", lwd=1.5)
+}
+mtext(spp_name[spp_sel[j]], side=1, line=-1.3, at=-135, cex=1.3)
+mtext(panel[(j+(2*(j-1)))], side=3, line=0.5, at=-175, cex=1.3)
+title("Empirical connectivity", line=1, cex.main=2.2)
 
-	map("world", fill=T, col="grey", border="grey", bg="white", mar=c(0,0,0,0), xlim=c(-180, -20), ylim=c(-15,70))
-	plot(hexgrid3_stem[which(summer.abundance>0),], col="orange", border="orange", add=T)
-	plot(hexgrid3_stem[which(winter.abundance>0),], col="light blue", border="light blue", add=T)
-	plot(hexgrid3_stem[which(summer.abundance>0),][unique(empiricalData_breedingHexagons3),], col="red", border="red", add=T)
-	plot(hexgrid3_stem[which(winter.abundance>0),][which(apply(EMD_flows[empiricalData_breedingHexagons3,], 2, sum) > 0),], col="blue", border="blue", add=T)
-	for(i in 1:length(empiricalData_breedingHexagons3)){
-		EMD_flows_sel <- EMD_flows[empiricalData_breedingHexagons3[i],]
-		if(sum(EMD_flows_sel)>0){
-			for(k in 1:length(which(EMD_flows_sel > 0))){
-				spl = SpatialLines(list(Lines(Line(rbind( hexgrid3_stem_centroids[which(winter.abundance>0),][which(EMD_flows_sel > 0)[k],], hexgrid3_stem_centroids[which(summer.abundance>0),][empiricalData_breedingHexagons3[i],] )),ID="a")))
-				plot(spl, add=T, col="black", lwd=1.5, cex=2)
-			}
-		}	
-	}
-	mtext(let[(j+(2*(j-1))+1)], side=3, line=0.5, at=-175, cex=1.3)
-	title("Simulated connectivity", line=1, cex.main=2.2)
-
-	plot(as.vector(distanceMat.empirical), as.vector(distanceMat.simulatedBR), pch=20, cex=0.8, axes=F, main=NULL, ylab="Simulated", xlab="Empirical", xlim=c(0,10000), ylim=c(0,10000), cex.lab=1.5)
-	axis(side=1)
-	axis(side=2)
-	abline(lm(as.vector(distanceMat.simulatedBR) ~ as.vector(distanceMat.empirical)), col="red", lwd=2)
-	mtext(let[(j+(2*(j-1))+2)], side=3, line=0.5, at=-500, cex=1.3)
-	mtext(bquote('r'["M"]*' = '* .(round(EMD.rM,3))), side=1, line=-1.3, at=5700, cex=1.4)
-	title("Simulated vs. empirical", line=1, cex.main=2.2)	
-	
-	
-j=2
-	summer.abundance <- read.csv(paste("Redistribution-model/STEMs/seasonalAbundance_", spp[spp_sel[j]], "_BR.csv", sep=""), header=F)[,1]
-	winter.abundance <- read.csv(paste("Redistribution-model/STEMs/seasonalAbundance_", spp[spp_sel[j]], "_NB.csv", sep=""), header=F)[,1]
-	EMD_results <- read.csv(paste("Redistribution-model/EMD-outputs/EMDresults_", spp[spp_sel[j]], ".csv", sep=""), header=FALSE)
-	EMD_flows <- EMD_results[which(summer.abundance>0), which(winter.abundance>0)]
-	
-	wintering.surfaces.origen <- readRDS("Redistribution-model/Genoscapes/CommonYellowthroat/COYE_WinterProbSurfaces.rds")
-	winter.data <- read.csv("Redistribution-model/Genoscapes/CommonYellowthroat/WinterData.csv")
-
-	# Get hexagons for genoscapes breeding and wintering destinations 
-	breeding_origen <- vector()
-	for(k in 3:length(colnames(wintering.surfaces.origen))){
-		breeding_origen[k] <- which(wintering.surfaces.origen[,k] == max(wintering.surfaces.origen[,k]))
-	}
-	breeding_origen <- breeding_origen[-c(1,2)]
-	wintering_origen <- winter.data[c(5,6)]
-
-	ptsBR = wintering.surfaces.origen[,1:2][breeding_origen,]
-	sptsBR <- SpatialPoints(ptsBR)
-	proj4string(sptsBR) <- proj4string(hexgrid3_stem)
-	breedingPoints_inHexagons <- gContains(hexgrid3_stem[which(summer.abundance>0),], sptsBR, byid=T)
-	breedingHexagons <- apply(breedingPoints_inHexagons, 1, function(x) which(x==TRUE))
-
-	ptsNB <- winter.data[c(5,6)]
-	colnames(ptsNB) <- c("x","y")
-	sptsNB <- SpatialPoints(ptsNB)
-	proj4string(sptsNB) <- proj4string(hexgrid3_stem)
-	winteringPoints_inHexagons <- gContains(hexgrid3_stem[which(winter.abundance>0),], sptsNB, byid=T)
-	winteringHexagons <- apply(winteringPoints_inHexagons, 1, function(x) which(x==TRUE))
-
-	toKeep <- which(lapply(breedingHexagons, length) > 0 & lapply(winteringHexagons, length) > 0)
-	empiricalData_breedingHexagons <- unlist(breedingHexagons[toKeep])
-	empiricalData_nonbreedingHexagons <- unlist(winteringHexagons[toKeep])
-	empiricalData_breedingHexagons2 <- unique(empiricalData_breedingHexagons)
-	empiricalData_nonbreedingHexagons2 <- unique(empiricalData_nonbreedingHexagons)
-	ptsBR <- ptsBR[toKeep,]
-	ptsNB <- ptsNB[toKeep,]
-
-	toKeep <- which(is.na(empiricalData_breedingHexagons) == F & is.na(empiricalData_nonbreedingHexagons) == F)
-	empiricalData_breedingHexagons3 <- empiricalData_breedingHexagons[toKeep]
-	empiricalData_nonbreedingHexagons3 <- empiricalData_nonbreedingHexagons[toKeep]
-	ptsBR <- ptsBR[toKeep,]
-	ptsNB <- ptsNB[toKeep,]
-	distanceMat.empirical <- vector()
-	for(i in 1:length(empiricalData_breedingHexagons3)){	
-		distanceMat.empirical <- rbind(distanceMat.empirical, distHaversine( hexgrid3_stem_centroids[which(summer.abundance>0),][empiricalData_breedingHexagons3[i],] , hexgrid3_stem_centroids[which(winter.abundance>0),][empiricalData_nonbreedingHexagons3,] ) / 1000)
-	}
-	winter.destinations <- list()
-	EMD_flows_sel <- EMD_flows[empiricalData_breedingHexagons3,]
-	for(i in 1:length(empiricalData_breedingHexagons3)){
-		winter.destinations[[i]] <- hexgrid3_stem_centroids[which(winter.abundance>0),][which(EMD_flows_sel[i,] > 0),]
-		if(length(which(EMD_flows_sel[i,] > 0)) > 1){
-			winter.destinations[[i]] <- apply(winter.destinations[[i]], 2, mean)
-		}
-	}
-	distanceMat.simulatedBR <- vector()
-	for(i in 1:length(empiricalData_breedingHexagons3)){
-		distanceMat.simulatedBR <- rbind(distanceMat.simulatedBR, distHaversine( hexgrid3_stem_centroids[which(summer.abundance>0),][empiricalData_breedingHexagons3[i],] , matrix(unlist(winter.destinations), ncol=2, byrow=T) ) / 1000)
-	}
-	aaa <- which(lapply(winter.destinations, length) == 0)
-	if(length(aaa)>0){
-		empiricalData_breedingHexagons3 <- empiricalData_breedingHexagons3[-aaa]
-		distanceMat.simulatedBR <- distanceMat.simulatedBR[-aaa,]
-		distanceMat.empirical <- distanceMat.empirical[-aaa,-aaa]
-	}
-		
-	#EMD.r2 <- summary(lm(as.vector(distanceMat.simulatedBR) ~ as.vector(distanceMat.empirical)))$r.squared	
-	#nullModel.r2 <- null.r2[[spp_sel1[j]]]
-	
-	EMD.rM <- mantel.rtest(as.dist(distanceMat.simulatedBR, upper=T), as.dist(distanceMat.empirical, upper=T), nrepet=0)
-	
-	# Plots
-	map("world", fill=T, col="grey", border="grey", bg="white", mar=c(0,0,0,0), xlim=c(-180, -20), ylim=c(-15,70))
-	plot(hexgrid3_stem[which(summer.abundance>0),], col="orange", border="orange", add=T)
-	plot(hexgrid3_stem[which(winter.abundance>0),], col="light blue", border="light blue", add=T)
-	plot(hexgrid3_stem[which(summer.abundance>0),][unique(empiricalData_breedingHexagons3),], col="red", border="red", add=T)
-	plot(hexgrid3_stem[which(winter.abundance>0),][unique(empiricalData_nonbreedingHexagons3),], col="blue", border="blue", add=T)
-	for(i in 1:length(ptsBR[,1])){
-		spl = SpatialLines(list(Lines(Line(rbind(ptsBR[i,], ptsNB[i,])),ID="a")), proj4string = CRS(proj4string(hexgrid3_stem)))
-		plot(spl, add=T, col="black", lwd=1.5)
-	}
-	mtext(spp_name[spp_sel[j]], side=1, line=-4, at=-135, cex=1.3)
-	mtext(let[(j+(2*(j-1)))], side=3, line=0.5, at=-175, cex=1.3)
-
-	map("world", fill=T, col="grey", border="grey", bg="white", mar=c(0,0,0,0), xlim=c(-180, -20), ylim=c(-15,70))
-	plot(hexgrid3_stem[which(summer.abundance>0),], col="orange", border="orange", add=T)
-	plot(hexgrid3_stem[which(winter.abundance>0),], col="light blue", border="light blue", add=T)
-	plot(hexgrid3_stem[which(summer.abundance>0),][unique(empiricalData_breedingHexagons3),], col="red", border="red", add=T)
-	plot(hexgrid3_stem[which(winter.abundance>0),][which(apply(EMD_flows[empiricalData_breedingHexagons3,], 2, sum) > 0),], col="blue", border="blue", add=T)
-	for(i in 1:length(empiricalData_breedingHexagons3)){
-		EMD_flows_sel <- EMD_flows[empiricalData_breedingHexagons3[i],]
-		if(sum(EMD_flows_sel)>0){
-			for(k in 1:length(which(EMD_flows_sel > 0))){
-				spl = SpatialLines(list(Lines(Line(rbind( hexgrid3_stem_centroids[which(winter.abundance>0),][which(EMD_flows_sel > 0)[k],], hexgrid3_stem_centroids[which(summer.abundance>0),][empiricalData_breedingHexagons3[i],] )),ID="a")))
-				plot(spl, add=T, col="black", lwd=1.5, cex=2)
-			}
-		}	
-	}
-	mtext(let[(j+(2*(j-1))+1)], side=3, line=0.5, at=-175, cex=1.3)
-
-	plot(as.vector(distanceMat.empirical), as.vector(distanceMat.simulatedBR), pch=20, cex=0.8, axes=F, main=NULL, ylab="Simulated", xlab="Empirical", xlim=c(0,8000), ylim=c(0,8000), cex.lab=1.5)
-	axis(side=1)
-	axis(side=2)
-	abline(lm(as.vector(distanceMat.simulatedBR) ~ as.vector(distanceMat.empirical)), col="red", lwd=2)
-	mtext(let[(j+(2*(j-1))+2)], side=3, line=0.5, at=-500, cex=1.3)
-	mtext(bquote('r'["M"]*' = '* .(round(EMD.rM,3))), side=1, line=-1.3, at=5700, cex=1.4)
-		
-
-j=3
-	summer.abundance <- read.csv(paste("Redistribution-model/STEMs/seasonalAbundance_", spp[spp_sel[j]], "_BR.csv", sep=""), header=F)[,1]
-	winter.abundance <- read.csv(paste("Redistribution-model/STEMs/seasonalAbundance_", spp[spp_sel[j]], "_NB.csv", sep=""), header=F)[,1]
-	EMD_results <- read.csv(paste("Redistribution-model/EMD-outputs/EMDresults_", spp[spp_sel[j]], ".csv", sep=""), header=FALSE)
-	EMD_flows <- EMD_results[which(summer.abundance>0), which(winter.abundance>0)]
-	wintering.assignments <- readRDS("Redistribution-model/Genoscapes/WilsonsWarbler/WIWA.WinterAssignment.rds")
-	wintering.surfaces.origen <- readRDS("Redistribution-model/Genoscapes/WilsonsWarbler/WIWA_WinterProbSurfaces.rds")
-
-	# Get hexagons for genoscapes breeding and wintering destinations 
-	breeding_origen <- vector()
-	for(k in 3:length(colnames(wintering.surfaces.origen))){
-		breeding_origen[k] <- which(wintering.surfaces.origen[,k] == max(wintering.surfaces.origen[,k]))
-	}
-	breeding_origen <- breeding_origen[-c(1,2)]
-
-	wintering_origen <- vector()
-	for(k in 3:length(colnames(wintering.surfaces.origen))){
-		if(length(which(wintering.assignments$indiv == colnames(wintering.surfaces.origen)[k])) > 0){
-			wintering_origen[k] <- which(wintering.assignments$indiv == colnames(wintering.surfaces.origen)[k])
-		}else{
-			wintering_origen[k] <- NA
+# Simulated migratory connectivity
+map("world", fill=T, col="grey", border="grey", bg="white", mar=c(0,0,0,0), xlim=c(-180, -20), ylim=c(-15,70))
+plot(hexgrid3_stem[which(summer.abundance>0),], col="orange", border="orange", add=T)
+plot(hexgrid3_stem[which(winter.abundance>0),], col="light blue", border="light blue", add=T)
+plot(hexgrid3_stem[which(summer.abundance>0),][unique(empiricalData_breedingHexagons3),], col="red", border="red", add=T)
+plot(hexgrid3_stem[which(winter.abundance>0),][which(apply(ORSIM_flows[empiricalData_breedingHexagons3,], 2, sum) > 0),], col="blue", border="blue", add=T)
+for(i in 1:length(empiricalData_breedingHexagons3)){
+	ORSIM_flows_sel <- ORSIM_flows[empiricalData_breedingHexagons3[i],]
+	if(sum(ORSIM_flows_sel)>0){
+		for(k in 1:length(which(ORSIM_flows_sel > 0))){
+			spl = SpatialLines(list(Lines(Line(rbind( hexgrid3_stem_centroids[which(winter.abundance>0),][which(ORSIM_flows_sel > 0)[k],], hexgrid3_stem_centroids[which(summer.abundance>0),][empiricalData_breedingHexagons3[i],] )),ID="a")))
+			plot(spl, add=T, col="black", lwd=1.5, cex=2.2)
 		}
 	}	
-	wintering_origen <- wintering_origen[-c(1,2)]
-	toRemove <- which(is.na(wintering_origen) == T)
-	if(length(toRemove)>0){
-		wintering_origen <- wintering_origen[-toRemove]
-		breeding_origen <- breeding_origen[-toRemove]
-	}
-	ptsBR = wintering.surfaces.origen[,1:2][breeding_origen,]
-	sptsBR <- SpatialPoints(ptsBR)
-	proj4string(sptsBR) <- proj4string(hexgrid3_stem)
-	breedingPoints_inHexagons <- gContains(hexgrid3_stem[which(summer.abundance>0),], sptsBR, byid=T)
-	breedingHexagons <- apply(breedingPoints_inHexagons, 1, function(x) which(x==TRUE))
-	ptsNB <- as.matrix(wintering.assignments[,6:5][wintering_origen,])
-	sptsNB <- SpatialPoints(ptsNB)
-	proj4string(sptsNB) <- proj4string(hexgrid3_stem)
-	winteringPoints_inHexagons <- gContains(hexgrid3_stem[which(winter.abundance>0),], sptsNB, byid=T)
-	winteringHexagons <- apply(winteringPoints_inHexagons, 1, function(x) which(x==TRUE))
+}
+mtext(panel[(j+(2*(j-1))+1)], side=3, line=0.5, at=-175, cex=1.3)
+title("Simulated connectivity", line=1, cex.main=2)
 
-	toKeep <- which(lapply(breedingHexagons, length) > 0 & lapply(winteringHexagons, length) > 0)
-	empiricalData_breedingHexagons <- unlist(breedingHexagons[toKeep])
-	empiricalData_nonbreedingHexagons <- unlist(winteringHexagons[toKeep])
-	empiricalData_breedingHexagons2 <- unique(empiricalData_breedingHexagons)
-	empiricalData_nonbreedingHexagons2 <- unique(empiricalData_nonbreedingHexagons)
+# Simulated versus empirical
+plot(as.vector(distanceMat.empirical), as.vector(distanceMat.simulatedBR), pch=20, cex=0.8, axes=F, main=NULL, ylab="Simulated", xlab="Empirical", xlim=c(0,10000), ylim=c(0,10000), cex.lab=1.5)
+axis(side=1)
+axis(side=2)
+abline(lm(as.vector(distanceMat.simulatedBR) ~ as.vector(distanceMat.empirical)), col="red", lwd=2)
+mtext(panel[(j+(2*(j-1))+2)], side=3, line=0.5, at=-500, cex=1.3)
+mtext(bquote('r'["M"]*' = '* .(round(ORSIM.rM,3))), side=1, line=-1.3, at=5700, cex=1.4)
+title("Simulated vs. empirical", line=1, cex.main=2.2)	
 	
-	toKeep <- which(is.na(empiricalData_breedingHexagons) == F & is.na(empiricalData_nonbreedingHexagons) == F)
-	empiricalData_breedingHexagons3 <- empiricalData_breedingHexagons[toKeep]
-	empiricalData_nonbreedingHexagons3 <- empiricalData_nonbreedingHexagons[toKeep]
-	ptsBR <- ptsBR[toKeep,]
-	ptsNB <- ptsNB[toKeep,]
-	distanceMat.empirical <- vector()
-	for(i in 1:length(empiricalData_breedingHexagons3)){	
-		distanceMat.empirical <- rbind(distanceMat.empirical, distHaversine( hexgrid3_stem_centroids[which(summer.abundance>0),][empiricalData_breedingHexagons3[i],] , hexgrid3_stem_centroids[which(winter.abundance>0),][empiricalData_nonbreedingHexagons3,] ) / 1000)
+	
+	
+# Commong Yellowthroat
+
+j = 2
+
+##  Load species seasonal abundance distributions  ##
+summer.abundance <- read.csv(paste("Data/STEMs/seasonalAbundance_", spp[spp_sel[j]], "_BR.csv", sep=""), header=F)[,1]
+winter.abundance <- read.csv(paste("Data/STEMs/seasonalAbundance_", spp[spp_sel[j]], "_NB.csv", sep=""), header=F)[,1]
+
+##  Load ORSIM output (simulated migratory connectivity)  ##
+ORSIM_results <- read.csv(paste("ORSIM-outputs/ORSIMresults_", spp[spp_sel[j]], ".csv", sep=""), header=FALSE)
+ORSIM_flows <- ORSIM_results[which(summer.abundance>0), which(winter.abundance>0)]
+	
+##  Get empirical migration data (location of breeding and wintering sites of individuals) for the species (genetic data for common yellowthroat)  ##
+wintering.surfaces.origen <- readRDS("Data/Genoscapes/CommonYellowthroat/COYE_WinterProbSurfaces.rds")
+winter.data <- read.csv("Data/Genoscapes/CommonYellowthroat/WinterData.csv")
+breeding_origen <- vector()
+for(k in 3:length(colnames(wintering.surfaces.origen))){
+	breeding_origen[k] <- which(wintering.surfaces.origen[,k] == max(wintering.surfaces.origen[,k]))
+}
+breeding_origen <- breeding_origen[-c(1,2)]
+wintering_origen <- winter.data[c(5,6)]
+
+##  Get hexagons containing the empirical breeding and wintering locations of individuals  ## 
+ptsBR = wintering.surfaces.origen[,1:2][breeding_origen,]
+sptsBR <- SpatialPoints(ptsBR)
+proj4string(sptsBR) <- proj4string(hexgrid3_stem)
+breedingPoints_inHexagons <- gContains(hexgrid3_stem[which(summer.abundance>0),], sptsBR, byid=T)
+breedingHexagons <- apply(breedingPoints_inHexagons, 1, function(x) which(x==TRUE))
+
+ptsNB <- winter.data[c(5,6)]
+colnames(ptsNB) <- c("x","y")
+sptsNB <- SpatialPoints(ptsNB)
+proj4string(sptsNB) <- proj4string(hexgrid3_stem)
+winteringPoints_inHexagons <- gContains(hexgrid3_stem[which(winter.abundance>0),], sptsNB, byid=T)
+winteringHexagons <- apply(winteringPoints_inHexagons, 1, function(x) which(x==TRUE))
+
+toKeep <- which(lapply(breedingHexagons, length) > 0 & lapply(winteringHexagons, length) > 0)
+empiricalData_breedingHexagons <- unlist(breedingHexagons[toKeep])
+empiricalData_nonbreedingHexagons <- unlist(winteringHexagons[toKeep])
+empiricalData_breedingHexagons2 <- unique(empiricalData_breedingHexagons)
+empiricalData_nonbreedingHexagons2 <- unique(empiricalData_nonbreedingHexagons)
+ptsBR <- ptsBR[toKeep,]
+ptsNB <- ptsNB[toKeep,]
+
+##  Only keep individuals for which both breeding and wintering locations fall within an hexagon occupied by the species (i.e. with a seasonal relative abundance > 0) ##
+toKeep <- which(is.na(empiricalData_breedingHexagons) == F & is.na(empiricalData_nonbreedingHexagons) == F)
+empiricalData_breedingHexagons3 <- empiricalData_breedingHexagons[toKeep]
+empiricalData_nonbreedingHexagons3 <- empiricalData_nonbreedingHexagons[toKeep]
+ptsBR <- ptsBR[toKeep,]
+ptsNB <- ptsNB[toKeep,]
+
+##  Compute pairwise distances between the sets of breeding and wintering locations of individuals in the empirical dataset  ##
+distanceMat.empirical <- vector() 
+for(i in 1:length(empiricalData_breedingHexagons3)){	
+	distanceMat.empirical <- rbind(distanceMat.empirical, distHaversine( hexgrid3_stem_centroids[which(summer.abundance>0),][empiricalData_breedingHexagons3[i],] , hexgrid3_stem_centroids[which(winter.abundance>0),][empiricalData_nonbreedingHexagons3,] ) / 1000)
+}
+
+##  Get wintering sites (hexagon) where simulated individuals from the empirical breeding sites (hexagons containing empirical breeding locations) are predicted to migrate  ##
+winter.destinations <- list()
+ORSIM_flows_sel <- ORSIM_flows[empiricalData_breedingHexagons3,]
+for(i in 1:length(empiricalData_breedingHexagons3)){
+	winter.destinations[[i]] <- hexgrid3_stem_centroids[which(winter.abundance>0),][which(ORSIM_flows_sel[i,] > 0),]
+	if(length(which(ORSIM_flows_sel[i,] > 0)) > 1){
+		winter.destinations[[i]] <- apply(winter.destinations[[i]], 2, mean)
 	}
-	winter.destinations <- list()
-	EMD_flows_sel <- EMD_flows[empiricalData_breedingHexagons3,]
-	for(i in 1:length(empiricalData_breedingHexagons3)){
-		winter.destinations[[i]] <- hexgrid3_stem_centroids[which(winter.abundance>0),][which(EMD_flows_sel[i,] > 0),]
-		if(length(which(EMD_flows_sel[i,] > 0)) > 1){
-			winter.destinations[[i]] <- apply(winter.destinations[[i]], 2, mean)
+}
+
+##  Compute pairwise distances between empirical breeding sites and corresponding simulated wintering sites  ##
+distanceMat.simulatedBR <- vector()
+for(i in 1:length(empiricalData_breedingHexagons3)){
+	distanceMat.simulatedBR <- rbind(distanceMat.simulatedBR, distHaversine( hexgrid3_stem_centroids[which(summer.abundance>0),][empiricalData_breedingHexagons3[i],] , matrix(unlist(winter.destinations), ncol=2, byrow=T) ) / 1000)
+}
+aaa <- which(lapply(winter.destinations, length) == 0)
+if(length(aaa)>0){
+	empiricalData_breedingHexagons3 <- empiricalData_breedingHexagons3[-aaa]
+	distanceMat.simulatedBR <- distanceMat.simulatedBR[-aaa,]
+	distanceMat.empirical <- distanceMat.empirical[-aaa,-aaa]
+}
+
+##  Compute the Mantel correlation coefficient	##
+ORSIM.rM <- mantel.rtest(as.dist(distanceMat.simulatedBR, upper=T), as.dist(distanceMat.empirical, upper=T), nrepet=0)
+	
+##  Plot the figure for this species  ##
+# Empirical migratory connectivity
+map("world", fill=T, col="grey", border="grey", bg="white", mar=c(0,0,0,0), xlim=c(-180, -20), ylim=c(-15,70))
+plot(hexgrid3_stem[which(summer.abundance>0),], col="orange", border="orange", add=T)
+plot(hexgrid3_stem[which(winter.abundance>0),], col="light blue", border="light blue", add=T)
+plot(hexgrid3_stem[which(summer.abundance>0),][unique(empiricalData_breedingHexagons3),], col="red", border="red", add=T)
+plot(hexgrid3_stem[which(winter.abundance>0),][unique(empiricalData_nonbreedingHexagons3),], col="blue", border="blue", add=T)
+for(i in 1:length(ptsBR[,1])){
+	spl = SpatialLines(list(Lines(Line(rbind(ptsBR[i,], ptsNB[i,])),ID="a")), proj4string = CRS(proj4string(hexgrid3_stem)))
+	plot(spl, add=T, col="black", lwd=1.5)
+}
+mtext(spp_name[spp_sel[j]], side=1, line=-4, at=-135, cex=1.3)
+mtext(panel[(j+(2*(j-1)))], side=3, line=0.5, at=-175, cex=1.3)
+
+# Simulated migratory connectivity
+map("world", fill=T, col="grey", border="grey", bg="white", mar=c(0,0,0,0), xlim=c(-180, -20), ylim=c(-15,70))
+plot(hexgrid3_stem[which(summer.abundance>0),], col="orange", border="orange", add=T)
+plot(hexgrid3_stem[which(winter.abundance>0),], col="light blue", border="light blue", add=T)
+plot(hexgrid3_stem[which(summer.abundance>0),][unique(empiricalData_breedingHexagons3),], col="red", border="red", add=T)
+plot(hexgrid3_stem[which(winter.abundance>0),][which(apply(ORSIM_flows[empiricalData_breedingHexagons3,], 2, sum) > 0),], col="blue", border="blue", add=T)
+for(i in 1:length(empiricalData_breedingHexagons3)){
+	ORSIM_flows_sel <- ORSIM_flows[empiricalData_breedingHexagons3[i],]
+	if(sum(ORSIM_flows_sel)>0){
+		for(k in 1:length(which(ORSIM_flows_sel > 0))){
+			spl = SpatialLines(list(Lines(Line(rbind( hexgrid3_stem_centroids[which(winter.abundance>0),][which(ORSIM_flows_sel > 0)[k],], hexgrid3_stem_centroids[which(summer.abundance>0),][empiricalData_breedingHexagons3[i],] )),ID="a")))
+			plot(spl, add=T, col="black", lwd=1.5, cex=2)
 		}
+	}	
+}
+mtext(panel[(j+(2*(j-1))+1)], side=3, line=0.5, at=-175, cex=1.3)
+
+# Simulated versus empirical
+plot(as.vector(distanceMat.empirical), as.vector(distanceMat.simulatedBR), pch=20, cex=0.8, axes=F, main=NULL, ylab="Simulated", xlab="Empirical", xlim=c(0,8000), ylim=c(0,8000), cex.lab=1.5)
+axis(side=1)
+axis(side=2)
+abline(lm(as.vector(distanceMat.simulatedBR) ~ as.vector(distanceMat.empirical)), col="red", lwd=2)
+mtext(panel[(j+(2*(j-1))+2)], side=3, line=0.5, at=-500, cex=1.3)
+mtext(bquote('r'["M"]*' = '* .(round(ORSIM.rM,3))), side=1, line=-1.3, at=5700, cex=1.4)
+
+
+
+# Wilson's Warbler
+
+j = 3
+
+##  Load species seasonal abundance distributions  ##
+summer.abundance <- read.csv(paste("Data/STEMs/seasonalAbundance_", spp[spp_sel[j]], "_BR.csv", sep=""), header=F)[,1]
+winter.abundance <- read.csv(paste("Data/STEMs/seasonalAbundance_", spp[spp_sel[j]], "_NB.csv", sep=""), header=F)[,1]
+
+##  Load ORSIM output (simulated migratory connectivity)  ##
+ORSIM_results <- read.csv(paste("ORSIM-outputs/ORSIMresults_", spp[spp_sel[j]], ".csv", sep=""), header=FALSE)
+ORSIM_flows <- ORSIM_results[which(summer.abundance>0), which(winter.abundance>0)]
+
+##  Get empirical migration data (location of breeding and wintering sites of individuals) for the species (genetic data for common yellowthroat)  ##
+wintering.assignments <- readRDS("Data/Genoscapes/WilsonsWarbler/WIWA.WinterAssignment.rds")
+wintering.surfaces.origen <- readRDS("Data/Genoscapes/WilsonsWarbler/WIWA_WinterProbSurfaces.rds")
+breeding_origen <- vector()
+for(k in 3:length(colnames(wintering.surfaces.origen))){
+	breeding_origen[k] <- which(wintering.surfaces.origen[,k] == max(wintering.surfaces.origen[,k]))
+}
+breeding_origen <- breeding_origen[-c(1,2)]
+wintering_origen <- vector()
+for(k in 3:length(colnames(wintering.surfaces.origen))){
+	if(length(which(wintering.assignments$indiv == colnames(wintering.surfaces.origen)[k])) > 0){
+		wintering_origen[k] <- which(wintering.assignments$indiv == colnames(wintering.surfaces.origen)[k])
+	}else{
+		wintering_origen[k] <- NA
 	}
-	distanceMat.simulatedBR <- vector()
-	for(i in 1:length(empiricalData_breedingHexagons3)){
-		distanceMat.simulatedBR <- rbind(distanceMat.simulatedBR, distHaversine( hexgrid3_stem_centroids[which(summer.abundance>0),][empiricalData_breedingHexagons3[i],] , matrix(unlist(winter.destinations), ncol=2, byrow=T) ) / 1000)
+}	
+wintering_origen <- wintering_origen[-c(1,2)]
+toRemove <- which(is.na(wintering_origen) == T)
+if(length(toRemove)>0){
+	wintering_origen <- wintering_origen[-toRemove]
+	breeding_origen <- breeding_origen[-toRemove]
+}
+
+##  Get hexagons containing the empirical breeding and wintering locations of individuals  ## 
+ptsBR = wintering.surfaces.origen[,1:2][breeding_origen,]
+sptsBR <- SpatialPoints(ptsBR)
+proj4string(sptsBR) <- proj4string(hexgrid3_stem)
+breedingPoints_inHexagons <- gContains(hexgrid3_stem[which(summer.abundance>0),], sptsBR, byid=T)
+breedingHexagons <- apply(breedingPoints_inHexagons, 1, function(x) which(x==TRUE))
+
+ptsNB <- as.matrix(wintering.assignments[,6:5][wintering_origen,])
+sptsNB <- SpatialPoints(ptsNB)
+proj4string(sptsNB) <- proj4string(hexgrid3_stem)
+winteringPoints_inHexagons <- gContains(hexgrid3_stem[which(winter.abundance>0),], sptsNB, byid=T)
+winteringHexagons <- apply(winteringPoints_inHexagons, 1, function(x) which(x==TRUE))
+
+toKeep <- which(lapply(breedingHexagons, length) > 0 & lapply(winteringHexagons, length) > 0)
+empiricalData_breedingHexagons <- unlist(breedingHexagons[toKeep])
+empiricalData_nonbreedingHexagons <- unlist(winteringHexagons[toKeep])
+empiricalData_breedingHexagons2 <- unique(empiricalData_breedingHexagons)
+empiricalData_nonbreedingHexagons2 <- unique(empiricalData_nonbreedingHexagons)
+
+##  Only keep individuals for which both breeding and wintering locations fall within an hexagon occupied by the species (i.e. with a seasonal relative abundance > 0) ##	
+toKeep <- which(is.na(empiricalData_breedingHexagons) == F & is.na(empiricalData_nonbreedingHexagons) == F)
+empiricalData_breedingHexagons3 <- empiricalData_breedingHexagons[toKeep]
+empiricalData_nonbreedingHexagons3 <- empiricalData_nonbreedingHexagons[toKeep]
+ptsBR <- ptsBR[toKeep,]
+ptsNB <- ptsNB[toKeep,]
+
+
+##  Compute pairwise distances between the sets of breeding and wintering locations of individuals in the empirical dataset  ##
+distanceMat.empirical <- vector() 
+for(i in 1:length(empiricalData_breedingHexagons3)){	
+	distanceMat.empirical <- rbind(distanceMat.empirical, distHaversine( hexgrid3_stem_centroids[which(summer.abundance>0),][empiricalData_breedingHexagons3[i],] , hexgrid3_stem_centroids[which(winter.abundance>0),][empiricalData_nonbreedingHexagons3,] ) / 1000)
+}
+
+##  Get wintering sites (hexagon) where simulated individuals from the empirical breeding sites (hexagons containing empirical breeding locations) are predicted to migrate  ##
+winter.destinations <- list()
+ORSIM_flows_sel <- ORSIM_flows[empiricalData_breedingHexagons3,]
+for(i in 1:length(empiricalData_breedingHexagons3)){
+	winter.destinations[[i]] <- hexgrid3_stem_centroids[which(winter.abundance>0),][which(ORSIM_flows_sel[i,] > 0),]
+	if(length(which(ORSIM_flows_sel[i,] > 0)) > 1){
+		winter.destinations[[i]] <- apply(winter.destinations[[i]], 2, mean)
 	}
-	aaa <- which(lapply(winter.destinations, length) == 0)
-	if(length(aaa)>0){
-		empiricalData_breedingHexagons3 <- empiricalData_breedingHexagons3[-aaa]
-		distanceMat.simulatedBR <- distanceMat.simulatedBR[-aaa,]
-		distanceMat.empirical <- distanceMat.empirical[-aaa,-aaa]
-	}
-		
-	#EMD.r2 <- summary(lm(as.vector(distanceMat.simulatedBR) ~ as.vector(distanceMat.empirical)))$r.squared	
-	#nullModel.r2 <- null.r2[[spp_sel1[j]]]
+}
+
+##  Compute pairwise distances between empirical breeding sites and corresponding simulated wintering sites  ##
+distanceMat.simulatedBR <- vector()
+for(i in 1:length(empiricalData_breedingHexagons3)){
+	distanceMat.simulatedBR <- rbind(distanceMat.simulatedBR, distHaversine( hexgrid3_stem_centroids[which(summer.abundance>0),][empiricalData_breedingHexagons3[i],] , matrix(unlist(winter.destinations), ncol=2, byrow=T) ) / 1000)
+}
+aaa <- which(lapply(winter.destinations, length) == 0)
+if(length(aaa)>0){
+	empiricalData_breedingHexagons3 <- empiricalData_breedingHexagons3[-aaa]
+	distanceMat.simulatedBR <- distanceMat.simulatedBR[-aaa,]
+	distanceMat.empirical <- distanceMat.empirical[-aaa,-aaa]
+}
+
+##  Compute the Mantel correlation coefficient	##
+ORSIM.rM <- mantel.rtest(as.dist(distanceMat.simulatedBR, upper=T), as.dist(distanceMat.empirical, upper=T), nrepet=0)
 	
-	EMD.rM <- mantel.rtest(as.dist(distanceMat.simulatedBR, upper=T), as.dist(distanceMat.empirical, upper=T), nrepet=0)
-	
-	# Plots
-	map("world", fill=T, col="grey", border="grey", bg="white", mar=c(0,0,0,0), xlim=c(-180, -20), ylim=c(-15,70))
-	plot(hexgrid3_stem[which(summer.abundance>0),], col="orange", border="orange", add=T)
-	plot(hexgrid3_stem[which(winter.abundance>0),], col="light blue", border="light blue", add=T)
-	plot(hexgrid3_stem[which(summer.abundance>0),][unique(empiricalData_breedingHexagons3),], col="red", border="red", add=T)
-	plot(hexgrid3_stem[which(winter.abundance>0),][unique(empiricalData_nonbreedingHexagons3),], col="blue", border="blue", add=T)
-	for(i in 1:length(ptsBR[,1])){
-		spl = SpatialLines(list(Lines(Line(rbind(ptsBR[i,], ptsNB[i,])),ID="a")), proj4string = CRS(proj4string(hexgrid3_stem)))
-		plot(spl, add=T, col="black", lwd=1.5)
-	}
-	mtext(spp_name[spp_sel[j]], side=1, line=-4, at=-135, cex=1.3)
-	mtext(let[(j+(2*(j-1)))], side=3, line=0.5, at=-175, cex=1.3)
+##  Plot the figure for this species  ##
+# Empirical migratory connectivity
+map("world", fill=T, col="grey", border="grey", bg="white", mar=c(0,0,0,0), xlim=c(-180, -20), ylim=c(-15,70))
+plot(hexgrid3_stem[which(summer.abundance>0),], col="orange", border="orange", add=T)
+plot(hexgrid3_stem[which(winter.abundance>0),], col="light blue", border="light blue", add=T)
+plot(hexgrid3_stem[which(summer.abundance>0),][unique(empiricalData_breedingHexagons3),], col="red", border="red", add=T)
+plot(hexgrid3_stem[which(winter.abundance>0),][unique(empiricalData_nonbreedingHexagons3),], col="blue", border="blue", add=T)
+for(i in 1:length(ptsBR[,1])){
+	spl = SpatialLines(list(Lines(Line(rbind(ptsBR[i,], ptsNB[i,])),ID="a")), proj4string = CRS(proj4string(hexgrid3_stem)))
+	plot(spl, add=T, col="black", lwd=1.5)
+}
+mtext(spp_name[spp_sel[j]], side=1, line=-4, at=-135, cex=1.3)
+mtext(panel[(j+(2*(j-1)))], side=3, line=0.5, at=-175, cex=1.3)
 
-	map("world", fill=T, col="grey", border="grey", bg="white", mar=c(0,0,0,0), xlim=c(-180, -20), ylim=c(-15,70))
-	plot(hexgrid3_stem[which(summer.abundance>0),], col="orange", border="orange", add=T)
-	plot(hexgrid3_stem[which(winter.abundance>0),], col="light blue", border="light blue", add=T)
-	plot(hexgrid3_stem[which(summer.abundance>0),][unique(empiricalData_breedingHexagons3),], col="red", border="red", add=T)
-	plot(hexgrid3_stem[which(winter.abundance>0),][which(apply(EMD_flows[empiricalData_breedingHexagons3,], 2, sum) > 0),], col="blue", border="blue", add=T)
-	for(i in 1:length(empiricalData_breedingHexagons3)){
-		EMD_flows_sel <- EMD_flows[empiricalData_breedingHexagons3[i],]
-		if(sum(EMD_flows_sel)>0){
-			for(k in 1:length(which(EMD_flows_sel > 0))){
-				spl = SpatialLines(list(Lines(Line(rbind( hexgrid3_stem_centroids[which(winter.abundance>0),][which(EMD_flows_sel > 0)[k],], hexgrid3_stem_centroids[which(summer.abundance>0),][empiricalData_breedingHexagons3[i],] )),ID="a")))
-				plot(spl, add=T, col="black", lwd=1.5, cex=2)
-			}
-		}	
-	}
-	mtext(let[(j+(2*(j-1))+1)], side=3, line=0.5, at=-175, cex=1.3)
-
-	plot(as.vector(distanceMat.empirical), as.vector(distanceMat.simulatedBR), pch=20, cex=0.8, axes=F, main=NULL, ylab="Simulated", xlab="Empirical", xlim=c(0,10000), ylim=c(0,10000), cex.lab=1.5)
-	axis(side=1)
-	axis(side=2)
-	abline(lm(as.vector(distanceMat.simulatedBR) ~ as.vector(distanceMat.empirical)), col="red", lwd=2)
-	mtext(let[(j+(2*(j-1))+2)], side=3, line=0.5, at=-500, cex=1.3)
-	mtext(bquote('r'["M"]*' = '* .(round(EMD.rM,3))), side=1, line=-1.3, at=5700, cex=1.4)
-		
-
-j=4
-	summer.abundance <- read.csv(paste("Redistribution-model/STEMs/seasonalAbundance_", spp[spp_sel[j]], "_BR.csv", sep=""), header=F)[,1]
-	winter.abundance <- read.csv(paste("Redistribution-model/STEMs/seasonalAbundance_", spp[spp_sel[j]], "_NB.csv", sep=""), header=F)[,1]
-	EMD_results <- read.csv(paste("Redistribution-model/EMD-outputs/EMDresults_", spp[spp_sel[j]], ".csv", sep=""), header=FALSE)
-	EMD_flows <- EMD_results[which(summer.abundance>0), which(winter.abundance>0)]
-	trackingData <- read.csv("Redistribution-model/Tracking-data/Vermivora/vermNBlatWKbk.csv", header=T)
-	trackingData$depLON <- -trackingData$depLON
-	trackingData$nbLON <- -trackingData$nbLON
-	ptsBR <- as.matrix(trackingData[,3:2][which(trackingData$sp == 2),]) # 1 = gowwar ; 2 = buwwar
-	ptsNB <- as.matrix(trackingData[,4:5][which(trackingData$sp == 2),])
-	dfBR = data.frame(a = 1:length(ptsBR[,1]))
-	sp.ptsBR <- SpatialPointsDataFrame(ptsBR, dfBR)
-	proj4string(sp.ptsBR) <- sr
-	empiricalData_breedingHexagons <- over(sp.ptsBR, hexgrid3_stem[which(summer.abundance>0),])
-	empiricalData_breedingHexagons2 <- unique(empiricalData_breedingHexagons[which(is.na(empiricalData_breedingHexagons)==FALSE)])
-	dfNB = data.frame(a = 1:length(ptsNB[,1]))
-	sp.ptsNB <- SpatialPointsDataFrame(ptsNB, dfNB)
-	proj4string(sp.ptsNB) <- sr
-	empiricalData_nonbreedingHexagons <- over(sp.ptsNB, hexgrid3_stem[which(winter.abundance>0),])
-	empiricalData_nonbreedingHexagons2 <- unique(empiricalData_nonbreedingHexagons[which(is.na(empiricalData_nonbreedingHexagons)==FALSE)])
-
-	toKeep <- which(is.na(empiricalData_breedingHexagons) == F & is.na(empiricalData_nonbreedingHexagons) == F)
-	empiricalData_breedingHexagons3 <- empiricalData_breedingHexagons[toKeep]
-	empiricalData_nonbreedingHexagons3 <- empiricalData_nonbreedingHexagons[toKeep]
-	ptsBR <- ptsBR[toKeep,]
-	ptsNB <- ptsNB[toKeep,]
-	distanceMat.empirical <- vector()
-	for(i in 1:length(empiricalData_breedingHexagons3)){	
-		distanceMat.empirical <- rbind(distanceMat.empirical, distHaversine( hexgrid3_stem_centroids[which(summer.abundance>0),][empiricalData_breedingHexagons3[i],] , hexgrid3_stem_centroids[which(winter.abundance>0),][empiricalData_nonbreedingHexagons3,] ) / 1000)
-	}
-	winter.destinations <- list()
-	EMD_flows_sel <- EMD_flows[empiricalData_breedingHexagons3,]
-	for(i in 1:length(empiricalData_breedingHexagons3)){
-		winter.destinations[[i]] <- hexgrid3_stem_centroids[which(winter.abundance>0),][which(EMD_flows_sel[i,] > 0),]
-		if(length(which(EMD_flows_sel[i,] > 0)) > 1){
-			winter.destinations[[i]] <- apply(winter.destinations[[i]], 2, mean)
+# Simulated migratory connectivity
+map("world", fill=T, col="grey", border="grey", bg="white", mar=c(0,0,0,0), xlim=c(-180, -20), ylim=c(-15,70))
+plot(hexgrid3_stem[which(summer.abundance>0),], col="orange", border="orange", add=T)
+plot(hexgrid3_stem[which(winter.abundance>0),], col="light blue", border="light blue", add=T)
+plot(hexgrid3_stem[which(summer.abundance>0),][unique(empiricalData_breedingHexagons3),], col="red", border="red", add=T)
+plot(hexgrid3_stem[which(winter.abundance>0),][which(apply(ORSIM_flows[empiricalData_breedingHexagons3,], 2, sum) > 0),], col="blue", border="blue", add=T)
+for(i in 1:length(empiricalData_breedingHexagons3)){
+	ORSIM_flows_sel <- ORSIM_flows[empiricalData_breedingHexagons3[i],]
+	if(sum(ORSIM_flows_sel)>0){
+		for(k in 1:length(which(ORSIM_flows_sel > 0))){
+			spl = SpatialLines(list(Lines(Line(rbind( hexgrid3_stem_centroids[which(winter.abundance>0),][which(ORSIM_flows_sel > 0)[k],], hexgrid3_stem_centroids[which(summer.abundance>0),][empiricalData_breedingHexagons3[i],] )),ID="a")))
+			plot(spl, add=T, col="black", lwd=1.5, cex=2)
 		}
-	}
-	distanceMat.simulatedBR <- vector()
-	for(i in 1:length(empiricalData_breedingHexagons3)){
-		distanceMat.simulatedBR <- rbind(distanceMat.simulatedBR, distHaversine( hexgrid3_stem_centroids[which(summer.abundance>0),][empiricalData_breedingHexagons3[i],] , matrix(unlist(winter.destinations), ncol=2, byrow=T) ) / 1000)
-	}
-	aaa <- which(lapply(winter.destinations, length) == 0)
-	if(length(aaa)>0){
-		empiricalData_breedingHexagons3 <- empiricalData_breedingHexagons3[-aaa]
-		distanceMat.simulatedBR <- distanceMat.simulatedBR[-aaa,]
-		distanceMat.empirical <- distanceMat.empirical[-aaa,-aaa]
-	}
-	
-	#EMD.r2 <- summary(lm(as.vector(distanceMat.simulatedBR) ~ as.vector(distanceMat.empirical)))$r.squared	
-	#nullModel.r2 <- null.r2[[spp_sel1[j]]]
-	
-	EMD.rM <- mantel.rtest(as.dist(distanceMat.simulatedBR, upper=T), as.dist(distanceMat.empirical, upper=T), nrepet=0)
-	
-	# Plots
-	map("world", fill=T, col="grey", border="grey", bg="white", mar=c(0,0,0,0), xlim=c(-180, -20), ylim=c(-15,70))
-	plot(hexgrid3_stem[which(summer.abundance>0),], col="orange", border="orange", add=T)
-	plot(hexgrid3_stem[which(winter.abundance>0),], col="light blue", border="light blue", add=T)
-	plot(hexgrid3_stem[which(summer.abundance>0),][unique(empiricalData_breedingHexagons3),], col="red", border="red", add=T)
-	plot(hexgrid3_stem[which(winter.abundance>0),][unique(empiricalData_nonbreedingHexagons3),], col="blue", border="blue", add=T)
-	for(i in 1:length(ptsBR[,1])){
-		spl = SpatialLines(list(Lines(Line(rbind(ptsBR[i,], ptsNB[i,])),ID="a")), proj4string = CRS(proj4string(hexgrid3_stem)))
-		plot(spl, add=T, col="black", lwd=1.5)
-	}
-	mtext(spp_name[spp_sel[j]], side=1, line=-4, at=-135, cex=1.3)
-	mtext(let[(j+(2*(j-1)))], side=3, line=0.5, at=-175, cex=1.3)
+	}	
+}
+mtext(panel[(j+(2*(j-1))+1)], side=3, line=0.5, at=-175, cex=1.3)
 
-	map("world", fill=T, col="grey", border="grey", bg="white", mar=c(0,0,0,0), xlim=c(-180, -20), ylim=c(-15,70))
-	plot(hexgrid3_stem[which(summer.abundance>0),], col="orange", border="orange", add=T)
-	plot(hexgrid3_stem[which(winter.abundance>0),], col="light blue", border="light blue", add=T)
-	plot(hexgrid3_stem[which(summer.abundance>0),][unique(empiricalData_breedingHexagons3),], col="red", border="red", add=T)
-	plot(hexgrid3_stem[which(winter.abundance>0),][which(apply(EMD_flows[empiricalData_breedingHexagons3,], 2, sum) > 0),], col="blue", border="blue", add=T)
-	for(i in 1:length(empiricalData_breedingHexagons3)){
-		EMD_flows_sel <- EMD_flows[empiricalData_breedingHexagons3[i],]
-		if(sum(EMD_flows_sel)>0){
-			for(k in 1:length(which(EMD_flows_sel > 0))){
-				spl = SpatialLines(list(Lines(Line(rbind( hexgrid3_stem_centroids[which(winter.abundance>0),][which(EMD_flows_sel > 0)[k],], hexgrid3_stem_centroids[which(summer.abundance>0),][empiricalData_breedingHexagons3[i],] )),ID="a")))
-				plot(spl, add=T, col="black", lwd=1.5, cex=2)
-			}
-		}	
+# Simulated versus empirical
+plot(as.vector(distanceMat.empirical), as.vector(distanceMat.simulatedBR), pch=20, cex=0.8, axes=F, main=NULL, ylab="Simulated", xlab="Empirical", xlim=c(0,10000), ylim=c(0,10000), cex.lab=1.5)
+axis(side=1)
+axis(side=2)
+abline(lm(as.vector(distanceMat.simulatedBR) ~ as.vector(distanceMat.empirical)), col="red", lwd=2)
+mtext(panel[(j+(2*(j-1))+2)], side=3, line=0.5, at=-500, cex=1.3)
+mtext(bquote('r'["M"]*' = '* .(round(ORSIM.rM,3))), side=1, line=-1.3, at=5700, cex=1.4)
+
+
+	
+# Blue winged Warbler
+
+j = 1
+
+##  Load species seasonal abundance distributions  ##
+summer.abundance <- read.csv(paste("Data/STEMs/seasonalAbundance_", spp[spp_sel[j]], "_BR.csv", sep=""), header=F)[,1]
+winter.abundance <- read.csv(paste("Data/STEMs/seasonalAbundance_", spp[spp_sel[j]], "_NB.csv", sep=""), header=F)[,1]
+
+##  Load ORSIM output (simulated migratory connectivity)  ##
+ORSIM_results <- read.csv(paste("ORSIM-outputs/ORSIMresults_", spp[spp_sel[j]], ".csv", sep=""), header=FALSE)
+ORSIM_flows <- ORSIM_results[which(summer.abundance>0), which(winter.abundance>0)]
+
+##  Get empirical migration data (location of breeding and wintering sites of individuals) for the species  ##
+trackingData <- read.csv("Redistribution-model/Tracking-data/Vermivora/vermNBlatWKbk.csv", header=T)
+trackingData$depLON <- -trackingData$depLON
+trackingData$nbLON <- -trackingData$nbLON
+ptsBR <- as.matrix(trackingData[,3:2][which(trackingData$sp == 2),]) # 1 = gowwar ; 2 = buwwar
+ptsNB <- as.matrix(trackingData[,4:5][which(trackingData$sp == 2),])
+
+
+##  Get hexagons containing the empirical breeding and wintering locations of individuals  ## 
+dfBR = data.frame(a = 1:length(ptsBR[,1]))
+sp.ptsBR <- SpatialPointsDataFrame(ptsBR, dfBR)
+proj4string(sp.ptsBR) <- sr
+empiricalData_breedingHexagons <- over(sp.ptsBR, hexgrid3_stem[which(summer.abundance>0),])
+empiricalData_breedingHexagons2 <- unique(empiricalData_breedingHexagons[which(is.na(empiricalData_breedingHexagons)==FALSE)])
+dfNB = data.frame(a = 1:length(ptsNB[,1]))
+sp.ptsNB <- SpatialPointsDataFrame(ptsNB, dfNB)
+proj4string(sp.ptsNB) <- sr
+empiricalData_nonbreedingHexagons <- over(sp.ptsNB, hexgrid3_stem[which(winter.abundance>0),])
+empiricalData_nonbreedingHexagons2 <- unique(empiricalData_nonbreedingHexagons[which(is.na(empiricalData_nonbreedingHexagons)==FALSE)])
+
+##  Only keep individuals for which both breeding and wintering locations fall within an hexagon occupied by the species (i.e. with a seasonal relative abundance > 0) ##
+toKeep <- which(is.na(empiricalData_breedingHexagons) == F & is.na(empiricalData_nonbreedingHexagons) == F)
+empiricalData_breedingHexagons3 <- empiricalData_breedingHexagons[toKeep]
+empiricalData_nonbreedingHexagons3 <- empiricalData_nonbreedingHexagons[toKeep]
+ptsBR <- ptsBR[toKeep,]
+ptsNB <- ptsNB[toKeep,]
+
+##  Compute pairwise distances between the sets of breeding and wintering locations of individuals in the empirical dataset  ##
+distanceMat.empirical <- vector() 
+for(i in 1:length(empiricalData_breedingHexagons3)){	
+	distanceMat.empirical <- rbind(distanceMat.empirical, distHaversine( hexgrid3_stem_centroids[which(summer.abundance>0),][empiricalData_breedingHexagons3[i],] , hexgrid3_stem_centroids[which(winter.abundance>0),][empiricalData_nonbreedingHexagons3,] ) / 1000)
+}
+
+##  Get wintering sites (hexagon) where simulated individuals from the empirical breeding sites (hexagons containing empirical breeding locations) are predicted to migrate  ##
+winter.destinations <- list()
+ORSIM_flows_sel <- ORSIM_flows[empiricalData_breedingHexagons3,]
+for(i in 1:length(empiricalData_breedingHexagons3)){
+	winter.destinations[[i]] <- hexgrid3_stem_centroids[which(winter.abundance>0),][which(ORSIM_flows_sel[i,] > 0),]
+	if(length(which(ORSIM_flows_sel[i,] > 0)) > 1){
+		winter.destinations[[i]] <- apply(winter.destinations[[i]], 2, mean)
 	}
-	mtext(let[(j+(2*(j-1))+1)], side=3, line=0.5, at=-175, cex=1.3)
+}
 
-	plot(as.vector(distanceMat.empirical), as.vector(distanceMat.simulatedBR), pch=20, cex=0.8, axes=F, main=NULL, ylab="Simulated", xlab="Empirical", xlim=c(0,7000), ylim=c(0,7000), cex.lab=1.5)
-	axis(side=1)
-	axis(side=2)
-	abline(lm(as.vector(distanceMat.simulatedBR) ~ as.vector(distanceMat.empirical)), col="red", lwd=2)
-	mtext(let[(j+(2*(j-1))+2)], side=3, line=0.5, at=-500, cex=1.3)
-	mtext(bquote('r'["M"]*' = '* .(round(EMD.rM,3))), side=1, line=-1.3, at=5700, cex=1.4)
+##  Compute pairwise distances between empirical breeding sites and corresponding simulated wintering sites  ##
+distanceMat.simulatedBR <- vector()
+for(i in 1:length(empiricalData_breedingHexagons3)){
+	distanceMat.simulatedBR <- rbind(distanceMat.simulatedBR, distHaversine( hexgrid3_stem_centroids[which(summer.abundance>0),][empiricalData_breedingHexagons3[i],] , matrix(unlist(winter.destinations), ncol=2, byrow=T) ) / 1000)
+}
+aaa <- which(lapply(winter.destinations, length) == 0)
+if(length(aaa)>0){
+	empiricalData_breedingHexagons3 <- empiricalData_breedingHexagons3[-aaa]
+	distanceMat.simulatedBR <- distanceMat.simulatedBR[-aaa,]
+	distanceMat.empirical <- distanceMat.empirical[-aaa,-aaa]
+}
+
+##  Compute the Mantel correlation coefficient	##
+ORSIM.rM <- mantel.rtest(as.dist(distanceMat.simulatedBR, upper=T), as.dist(distanceMat.empirical, upper=T), nrepet=0)
+	
+##  Plot the figure for this species  ##
+# Empirical migratory connectivity
+map("world", fill=T, col="grey", border="grey", bg="white", mar=c(0,0,0,0), xlim=c(-180, -20), ylim=c(-15,70))
+plot(hexgrid3_stem[which(summer.abundance>0),], col="orange", border="orange", add=T)
+plot(hexgrid3_stem[which(winter.abundance>0),], col="light blue", border="light blue", add=T)
+plot(hexgrid3_stem[which(summer.abundance>0),][unique(empiricalData_breedingHexagons3),], col="red", border="red", add=T)
+plot(hexgrid3_stem[which(winter.abundance>0),][unique(empiricalData_nonbreedingHexagons3),], col="blue", border="blue", add=T)
+for(i in 1:length(ptsBR[,1])){
+	spl = SpatialLines(list(Lines(Line(rbind(ptsBR[i,], ptsNB[i,])),ID="a")), proj4string = CRS(proj4string(hexgrid3_stem)))
+	plot(spl, add=T, col="black", lwd=1.5)
+}
+mtext(spp_name[spp_sel[j]], side=1, line=-4, at=-135, cex=1.3)
+mtext(panel[(j+(2*(j-1)))], side=3, line=0.5, at=-175, cex=1.3)
+title("Empirical connectivity", line=1, cex.main=2.2)
+
+# Simulated migratory connectivity
+map("world", fill=T, col="grey", border="grey", bg="white", mar=c(0,0,0,0), xlim=c(-180, -20), ylim=c(-15,70))
+plot(hexgrid3_stem[which(summer.abundance>0),], col="orange", border="orange", add=T)
+plot(hexgrid3_stem[which(winter.abundance>0),], col="light blue", border="light blue", add=T)
+plot(hexgrid3_stem[which(summer.abundance>0),][unique(empiricalData_breedingHexagons3),], col="red", border="red", add=T)
+plot(hexgrid3_stem[which(winter.abundance>0),][which(apply(ORSIM_flows[empiricalData_breedingHexagons3,], 2, sum) > 0),], col="blue", border="blue", add=T)
+for(i in 1:length(empiricalData_breedingHexagons3)){
+	ORSIM_flows_sel <- ORSIM_flows[empiricalData_breedingHexagons3[i],]
+	if(sum(ORSIM_flows_sel)>0){
+		for(k in 1:length(which(ORSIM_flows_sel > 0))){
+			spl = SpatialLines(list(Lines(Line(rbind( hexgrid3_stem_centroids[which(winter.abundance>0),][which(ORSIM_flows_sel > 0)[k],], hexgrid3_stem_centroids[which(summer.abundance>0),][empiricalData_breedingHexagons3[i],] )),ID="a")))
+			plot(spl, add=T, col="black", lwd=1.5, cex=2)
+		}
+	}	
+}
+mtext(panel[(j+(2*(j-1))+1)], side=3, line=0.5, at=-175, cex=1.3)
+title("Simulated connectivity", line=1, cex.main=2.2)
+
+# Simulated versus empirical
+plot(as.vector(distanceMat.empirical), as.vector(distanceMat.simulatedBR), pch=20, cex=0.8, axes=F, main=NULL, ylab="Simulated", xlab="Empirical", xlim=c(0,7000), ylim=c(0,7000), cex.lab=1.5)
+axis(side=1)
+axis(side=2)
+abline(lm(as.vector(distanceMat.simulatedBR) ~ as.vector(distanceMat.empirical)), col="red", lwd=2)
+mtext(panel[(j+(2*(j-1))+2)], side=3, line=0.5, at=-500, cex=1.3)
+mtext(bquote('r'["M"]*' = '* .(round(ORSIM.rM,3))), side=1, line=-1.3, at=5700, cex=1.4)
+title("Simulated vs. empirical", line=1, cex.main=2.2)
 	
 	
-for(j in 5:length(spp_sel)){
+	
+# Ovenbird and White-throated Sparrow
+	
+for(j in 2:length(spp_sel)){
 
-	summer.abundance <- read.csv(paste("Redistribution-model/STEMs/seasonalAbundance_", spp[spp_sel[j]], "_BR.csv", sep=""), header=F)[,1]
-	winter.abundance <- read.csv(paste("Redistribution-model/STEMs/seasonalAbundance_", spp[spp_sel[j]], "_NB.csv", sep=""), header=F)[,1]
-	EMD_results <- read.csv(paste("Redistribution-model/EMD-outputs/EMDresults_", spp[spp_sel[j]], ".csv", sep=""), header=FALSE)
-	EMD_flows <- EMD_results[which(summer.abundance>0), which(winter.abundance>0)]
+	##  Load species seasonal abundance distributions  ##
+	summer.abundance <- read.csv(paste("Data/STEMs/seasonalAbundance_", spp[spp_sel[j]], "_BR.csv", sep=""), header=F)[,1]
+	winter.abundance <- read.csv(paste("Data/STEMs/seasonalAbundance_", spp[spp_sel[j]], "_NB.csv", sep=""), header=F)[,1]
+
+	##  Load ORSIM output (simulated migratory connectivity)  ##
+	ORSIM_results <- read.csv(paste("ORSIM-outputs/ORSIMresults_", spp[spp_sel[j]], ".csv", sep=""), header=FALSE)
+	ORSIM_flows <- ORSIM_results[which(summer.abundance>0), which(winter.abundance>0)]
+
+	##  Get empirical migration data (location of breeding and wintering sites of individuals) for the species  ##
 	ptsBR <- vector()
 	ptsNB <- vector()
+	# Banding data
 	if(is.na(spp_banding[spp_sel[j]])==F){
-		bandingData <- read.csv(paste("Redistribution-model/Banding-data/", spp_banding[spp_sel[j]], "_combine.csv", sep=""), header=T)
+		bandingData <- read.csv(paste("Data/Banding-data/", spp_banding[spp_sel[j]], "_combine.csv", sep=""), header=T)
 		for(i in 1:length(bandingData$GISBLONG)){
 			if(bandingData$B_SEASON[i] == "B"){
 				ptsBR = rbind(ptsBR, c(bandingData$GISBLONG[i], bandingData$GISBLAT[i]))
@@ -1400,12 +1526,15 @@ for(j in 5:length(spp_sel)){
 			}	
 		}
 	}
+	# Tracking data
 	if(is.na(spp_tracking[spp_sel[j]])==F){
-		trackingData <- read.csv("Redistribution-model/Tracking-data/data.csv", header=T)
+		trackingData <- read.csv("Data/Tracking-data/data.csv", header=T)
 		trackingData_sel <- trackingData[which(trackingData$species == spp_tracking[spp_sel[j]]),]
 		ptsBR <- rbind(ptsBR, cbind(trackingData_sel$blon, trackingData_sel$blat))
 		ptsNB <- rbind(ptsNB, cbind(trackingData_sel$wlon1, trackingData_sel$wlat1))
 	}
+
+	##  Get hexagons containing the empirical breeding and wintering locations of individuals  ## 
 	dfBR = data.frame(a = 1:length(ptsBR[,1]))
 	sp.ptsBR <- SpatialPointsDataFrame(ptsBR, dfBR)
 	proj4string(sp.ptsBR) <- sr
@@ -1417,23 +1546,30 @@ for(j in 5:length(spp_sel)){
 	empiricalData_nonbreedingHexagons <- over(sp.ptsNB, hexgrid3_stem[which(winter.abundance>0),])
 	empiricalData_nonbreedingHexagons2 <- unique(empiricalData_nonbreedingHexagons[which(is.na(empiricalData_nonbreedingHexagons)==FALSE)])
 
+	##  Only keep individuals for which both breeding and wintering locations fall within an hexagon occupied by the species (i.e. with a seasonal relative abundance > 0) ##
 	toKeep <- which(is.na(empiricalData_breedingHexagons) == F & is.na(empiricalData_nonbreedingHexagons) == F)
 	empiricalData_breedingHexagons3 <- empiricalData_breedingHexagons[toKeep]
 	empiricalData_nonbreedingHexagons3 <- empiricalData_nonbreedingHexagons[toKeep]
 	ptsBR <- ptsBR[toKeep,]
 	ptsNB <- ptsNB[toKeep,]
-	distanceMat.empirical <- vector()
+
+	##  Compute pairwise distances between the sets of breeding and wintering locations of individuals in the empirical dataset  ##
+	distanceMat.empirical <- vector() 
 	for(i in 1:length(empiricalData_breedingHexagons3)){	
-		distanceMat.empirical <- rbind(distanceMat.empirical, distHaversine( hexgrid3_stem_centroids[which(summer.abundance>0),][empiricalData_breedingHexagons3[i],] , hexgrid3_stem_centroids[which(winter.abundance>0),][empiricalData_nonbreedingHexagons3,] ) / 1000)
+		distanceMat.empirical <- rbind(distanceMat.empirical, distHaversine( hexgrid3_stem_centroids[which(summer.abundance>0),][empiricalData_breedingHexagons3[i],] , 	hexgrid3_stem_centroids[which(winter.abundance>0),][empiricalData_nonbreedingHexagons3,] ) / 1000)
 	}
+
+	##  Get wintering sites (hexagon) where simulated individuals from the empirical breeding sites (hexagons containing empirical breeding locations) are predicted to migrate  ##
 	winter.destinations <- list()
-	EMD_flows_sel <- EMD_flows[empiricalData_breedingHexagons3,]
+	ORSIM_flows_sel <- ORSIM_flows[empiricalData_breedingHexagons3,]
 	for(i in 1:length(empiricalData_breedingHexagons3)){
-		winter.destinations[[i]] <- hexgrid3_stem_centroids[which(winter.abundance>0),][which(EMD_flows_sel[i,] > 0),]
-		if(length(which(EMD_flows_sel[i,] > 0)) > 1){
+		winter.destinations[[i]] <- hexgrid3_stem_centroids[which(winter.abundance>0),][which(ORSIM_flows_sel[i,] > 0),]
+		if(length(which(ORSIM_flows_sel[i,] > 0)) > 1){
 			winter.destinations[[i]] <- apply(winter.destinations[[i]], 2, mean)
 		}
 	}
+
+	##  Compute pairwise distances between empirical breeding sites and corresponding simulated wintering sites  ##
 	distanceMat.simulatedBR <- vector()
 	for(i in 1:length(empiricalData_breedingHexagons3)){
 		distanceMat.simulatedBR <- rbind(distanceMat.simulatedBR, distHaversine( hexgrid3_stem_centroids[which(summer.abundance>0),][empiricalData_breedingHexagons3[i],] , matrix(unlist(winter.destinations), ncol=2, byrow=T) ) / 1000)
@@ -1444,13 +1580,12 @@ for(j in 5:length(spp_sel)){
 		distanceMat.simulatedBR <- distanceMat.simulatedBR[-aaa,]
 		distanceMat.empirical <- distanceMat.empirical[-aaa,-aaa]
 	}
-		
-	#EMD.r2 <- summary(lm(as.vector(distanceMat.simulatedBR) ~ as.vector(distanceMat.empirical)))$r.squared
-	#nullModel.r2 <- null.r2[[spp_sel1[j]]]
 
-	EMD.rM <- mantel.rtest(as.dist(distanceMat.simulatedBR, upper=T), as.dist(distanceMat.empirical, upper=T), nrepet=0)
+	##  Compute the Mantel correlation coefficient	##
+	ORSIM.rM <- mantel.rtest(as.dist(distanceMat.simulatedBR, upper=T), as.dist(distanceMat.empirical, upper=T), nrepet=0)
 	
-	# Plots
+	##  Plot the figure for this species  ##
+	# Empirical migratory connectivity
 	map("world", fill=T, col="grey", border="grey", bg="white", mar=c(0,0,0,0), xlim=c(-180, -20), ylim=c(-15,70))
 	plot(hexgrid3_stem[which(summer.abundance>0),], col="orange", border="orange", add=T)
 	plot(hexgrid3_stem[which(winter.abundance>0),], col="light blue", border="light blue", add=T)
@@ -1461,33 +1596,34 @@ for(j in 5:length(spp_sel)){
 		plot(spl, add=T, col="black", lwd=1.5)
 	}
 	mtext(spp_name[spp_sel[j]], side=1, line=-4, at=-135, cex=1.3)
-	mtext(let[(j+(2*(j-1)))], side=3, line=0.5, at=-175, cex=1.3)
+	mtext(panel[(j+(2*(j-1)))], side=3, line=0.5, at=-175, cex=1.3)
 
+	# Simulated migratory connectivity
 	map("world", fill=T, col="grey", border="grey", bg="white", mar=c(0,0,0,0), xlim=c(-180, -20), ylim=c(-15,70))
 	plot(hexgrid3_stem[which(summer.abundance>0),], col="orange", border="orange", add=T)
 	plot(hexgrid3_stem[which(winter.abundance>0),], col="light blue", border="light blue", add=T)
 	plot(hexgrid3_stem[which(summer.abundance>0),][unique(empiricalData_breedingHexagons3),], col="red", border="red", add=T)
-	plot(hexgrid3_stem[which(winter.abundance>0),][which(apply(EMD_flows[empiricalData_breedingHexagons3,], 2, sum) > 0),], col="blue", border="blue", add=T)
+	plot(hexgrid3_stem[which(winter.abundance>0),][which(apply(ORSIM_flows[empiricalData_breedingHexagons3,], 2, sum) > 0),], col="blue", border="blue", add=T)
 	for(i in 1:length(empiricalData_breedingHexagons3)){
-		EMD_flows_sel <- EMD_flows[empiricalData_breedingHexagons3[i],]
-		if(sum(EMD_flows_sel)>0){
-			for(k in 1:length(which(EMD_flows_sel > 0))){
-				spl = SpatialLines(list(Lines(Line(rbind( hexgrid3_stem_centroids[which(winter.abundance>0),][which(EMD_flows_sel > 0)[k],], hexgrid3_stem_centroids[which(summer.abundance>0),][empiricalData_breedingHexagons3[i],] )),ID="a")))
+		ORSIM_flows_sel <- ORSIM_flows[empiricalData_breedingHexagons3[i],]
+		if(sum(ORSIM_flows_sel)>0){
+			for(k in 1:length(which(ORSIM_flows_sel > 0))){
+				spl = SpatialLines(list(Lines(Line(rbind( hexgrid3_stem_centroids[which(winter.abundance>0),][which(ORSIM_flows_sel > 0)[k],], hexgrid3_stem_centroids[which(summer.abundance>0),][empiricalData_breedingHexagons3[i],] )),ID="a")))
 				plot(spl, add=T, col="black", lwd=1.5, cex=2)
 			}
 		}	
 	}
-	mtext(let[(j+(2*(j-1))+1)], side=3, line=0.5, at=-175, cex=1.3)
+	mtext(panel[(j+(2*(j-1))+1)], side=3, line=0.5, at=-175, cex=1.3)
 
+	# Simulated versus empirical
 	plot(as.vector(distanceMat.empirical), as.vector(distanceMat.simulatedBR), pch=20, cex=0.8, axes=F, main=NULL, ylab="Simulated", xlab="Empirical", xlim=c(0,7000), ylim=c(0,7000), cex.lab=1.5)
 	axis(side=1)
 	axis(side=2)
 	abline(lm(as.vector(distanceMat.simulatedBR) ~ as.vector(distanceMat.empirical)), col="red", lwd=2)
-	mtext(let[(j+(2*(j-1))+2)], side=3, line=0.5, at=-500, cex=1.3)
-	mtext(bquote('r'["M"]*' = '* .(round(EMD.rM,3))), side=1, line=-1.3, at=5700, cex=1.4)	
-	
+	mtext(panel[(j+(2*(j-1))+2)], side=3, line=0.5, at=-500, cex=1.3)
+	mtext(bquote('r'["M"]*' = '* .(round(ORSIM.rM,3))), side=1, line=-1.3, at=5700, cex=1.4)	
 }
-dev.off()	
+dev.off()		
 	
 	
 	
