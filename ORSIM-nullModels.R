@@ -17,9 +17,35 @@ library(ade4)
 setwd("/Volumes/Marius_SSD/American-Flyway/Connectivity_NAbirds/Redistribution-model")
 
 
-##  Lists of species names in the dataset  ##
+##  Construct an hexagon grid covering the Americas  ##
 
+hexgrid <- dgconstruct(projection="ISEA", topology="HEXAGON", res=7, metric=T)
+hexgrid_center <- dgSEQNUM_to_GEO(hexgrid, 1:21872) # 65612 / 590492
+hexgrid_centroids <- cbind(hexgrid_center$lon_deg, hexgrid_center$lat_deg)
+hex_sel <- which(hexgrid_centroids[,1] < -30 & hexgrid_centroids[,1] > -170 & hexgrid_centroids[,2] > -60 & hexgrid_centroids[,2] < 80)
+hexgrid2_stem <- dgcellstogrid(hexgrid, hex_sel, frame=F,wrapcells=TRUE)
+hexgrid2_stem_centroids <- matrix(unlist(lapply(hexgrid2_stem@polygons, function(x) x@labpt)), byrow=T, ncol=2)
+newmap <- getMap(resolution = "low")
+newmap <- spTransform(newmap, proj4string(hexgrid2_stem))
+newmap@data$world <- rep(1,length(newmap@data$SOVEREIGNT))
+newmap <- gBuffer(newmap, byid=TRUE, width=0)
+newmap <- gUnaryUnion(newmap, id=newmap@data$world)
+hexgrid3_stem <- gIntersection(hexgrid2_stem, newmap, byid=T)
+hexgrid3_stem_centroids <- matrix(unlist(lapply(hexgrid3_stem@polygons, function(x) x@labpt)), byrow=T, ncol=2)
+sr <- proj4string(hexgrid3_stem)
+
+
+##  Lists of species names for the various datasets  ##
+
+spp_name <- c("Wood Thrush", "Yellow Warbler", "Tree Swallow", "Swainson's Thrush", "Wilson's Warbler", "Common Yellowthroat", "Canada Warbler", "American Redstart", "Hermit Thrush", "Kentucky Warbler", "American Kestrel", "American Robin", "Anna's Hummingbird", "Common Loon", "Burrowing Owl", "Painted Bunting", "Western Tanager", "Willow Flycatcher", "American Goldfinch", "Brown headed Cowbird", "Brown Thrasher", "Common Grackle", "Purple Finch", "Red winged Blackbird", "White throated Sparrow", "Blue winged Warbler", "Golden winged Warbler", "Ovenbird", "Prothonotary Warbler", "Osprey", "Barn Swallow", "Golden crowned Sparrow", "Gray Catbird", "Blackpoll Warbler")
 spp <- c("woothr", "yelwar", "treswa", "swathr", "wlswar", "comyel", "canwar", "amered", "herthr", "kenwar", "amekes", "amerob", "annhum", "comloo", "burowl", "paibun", "westan", "wilfly", "amegfi", "bnhcow", "brnthr", "comgra", "purfin", "rewbla", "whtspa", "buwwar", "gowwar", "ovenbi1", "prowar", "osprey", "barswa", "gocspa", "grycat", "bkpwar")
+spp_banding <- c("WOTH", "YEWA", "TRES", "SWTH", NA, "COYE", NA, "AMRE", "HETH", NA, "AMKE", "AMRO", NA, "COLO", "BUOW", "PABU", NA, "WIFL", "AMGO", "BHCO", "BRTH", "COGR", "PUFI", "RWBL", "WTSP", NA, NA, "OVEN", NA, "OSPR", "BARS", "GCSP", "GRCA", NA)
+spp_tracking <- c("wood thrush", NA, NA, "swainson's thrush", NA, NA, NA, NA, "hermit thrush", NA, NA, NA, NA, NA, NA, NA, NA ,NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, "ovenbird", "prothonotary warbler", "osprey", "barn swallow", NA, "gray catbird", "blackpoll warbler")
+
+
+# Selected species for the analysis
+spp_sel_all <- c(1,3,4,9,11,12,14,15,19,20,21,22,23,24,25,28,30,31,33,2,16,26,27,32,34,6,18,5)
+
 
 
 ##  Declare objects ##
