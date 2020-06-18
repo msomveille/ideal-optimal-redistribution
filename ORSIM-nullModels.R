@@ -164,13 +164,13 @@ for(j in 1:length(spp_sel)){
 	##  Compute pairwise longitudinal difference between empirical breeding sites and corresponding simulated wintering sites  ##
 	distanceMat.simulated.longitude <- vector()
 	for(i in 1:length(empiricalData_breedingHexagons3)){
-		distanceMat.simulated.longitude <- rbind(distanceMat.simulated.longitude, hexgrid3_stem_centroids[which(summer.abundance>0),1][empiricalData_breedingHexagons3[i]] - unlist(winter.destinations) )
+		distanceMat.simulated.longitude <- rbind(distanceMat.simulated.longitude, hexgrid3_stem_centroids[which(summer.abundance>0),1][empiricalData_breedingHexagons3[i]] - matrix(unlist(winter.destinations), ncol=2, byrow=T)[,1] )
 	}
 	
 	##  Compute pairwise latitudinal difference between empirical breeding sites and corresponding simulated wintering sites  ##
 	distanceMat.simulated.latitude <- vector()
 	for(i in 1:length(empiricalData_breedingHexagons3)){
-		distanceMat.simulated.latitude <- rbind(distanceMat.simulated.latitude, hexgrid3_stem_centroids[which(summer.abundance>0),2][empiricalData_breedingHexagons3[i]] - unlist(winter.destinations) )
+		distanceMat.simulated.latitude <- rbind(distanceMat.simulated.latitude, hexgrid3_stem_centroids[which(summer.abundance>0),2][empiricalData_breedingHexagons3[i]] - matrix(unlist(winter.destinations), ncol=2, byrow=T)[,2] )
 	}
 	
 	aaa <- which(lapply(winter.destinations, length) == 0)
@@ -180,6 +180,8 @@ for(j in 1:length(spp_sel)){
 		distanceMat.simulated.longitude <- distanceMat.simulated.longitude[-aaa,]
 		distanceMat.simulated.latitude <- distanceMat.simulated.latitude[-aaa,]
 		distanceMat.empirical <- distanceMat.empirical[-aaa,-aaa]
+		distanceMat.empirical.longitude <- distanceMat.empirical.longitude[-aaa,-aaa]
+		distanceMat.empirical.latitude <- distanceMat.empirical.latitude[-aaa,-aaa]
 	}
 
 	##  Compute the Mantel correlation coefficients	##
@@ -437,13 +439,13 @@ for(i in 1:length(empiricalData_breedingHexagons3)){
 ##  Compute pairwise longitudinal difference between empirical breeding sites and corresponding simulated wintering sites  ##
 distanceMat.simulated.longitude <- vector()
 for(i in 1:length(empiricalData_breedingHexagons3)){
-	distanceMat.simulated.longitude <- rbind(distanceMat.simulated.longitude, hexgrid3_stem_centroids[which(summer.abundance>0),1][empiricalData_breedingHexagons3[i]] - unlist(winter.destinations) )
+	distanceMat.simulated.longitude <- rbind(distanceMat.simulated.longitude, hexgrid3_stem_centroids[which(summer.abundance>0),1][empiricalData_breedingHexagons3[i]] - matrix(unlist(winter.destinations), ncol=2, byrow=T)[,1] )
 }
 	
 ##  Compute pairwise latitudinal difference between empirical breeding sites and corresponding simulated wintering sites  ##
 distanceMat.simulated.latitude <- vector()
 for(i in 1:length(empiricalData_breedingHexagons3)){
-	distanceMat.simulated.latitude <- rbind(distanceMat.simulated.latitude, hexgrid3_stem_centroids[which(summer.abundance>0),2][empiricalData_breedingHexagons3[i]] - unlist(winter.destinations) )
+	distanceMat.simulated.latitude <- rbind(distanceMat.simulated.latitude, hexgrid3_stem_centroids[which(summer.abundance>0),2][empiricalData_breedingHexagons3[i]] - matrix(unlist(winter.destinations), ncol=2, byrow=T)[,2] )
 }
 	
 aaa <- which(lapply(winter.destinations, length) == 0)
@@ -453,6 +455,8 @@ if(length(aaa)>0){
 	distanceMat.simulated.longitude <- distanceMat.simulated.longitude[-aaa,]
 	distanceMat.simulated.latitude <- distanceMat.simulated.latitude[-aaa,]
 	distanceMat.empirical <- distanceMat.empirical[-aaa,-aaa]
+	distanceMat.empirical.longitude <- distanceMat.empirical.longitude[-aaa,-aaa]
+	distanceMat.empirical.latitude <- distanceMat.empirical.latitude[-aaa,-aaa]
 }
 
 ##  Compute the Mantel correlation coefficients	##
@@ -679,13 +683,13 @@ for(i in 1:length(empiricalData_breedingHexagons3)){
 ##  Compute pairwise longitudinal difference between empirical breeding sites and corresponding simulated wintering sites  ##
 distanceMat.simulated.longitude <- vector()
 for(i in 1:length(empiricalData_breedingHexagons3)){
-	distanceMat.simulated.longitude <- rbind(distanceMat.simulated.longitude, hexgrid3_stem_centroids[which(summer.abundance>0),1][empiricalData_breedingHexagons3[i]] - unlist(winter.destinations) )
+	distanceMat.simulated.longitude <- rbind(distanceMat.simulated.longitude, hexgrid3_stem_centroids[which(summer.abundance>0),1][empiricalData_breedingHexagons3[i]] - matrix(unlist(winter.destinations), ncol=2, byrow=T)[,1] )
 }
 	
 ##  Compute pairwise latitudinal difference between empirical breeding sites and corresponding simulated wintering sites  ##
 distanceMat.simulated.latitude <- vector()
 for(i in 1:length(empiricalData_breedingHexagons3)){
-	distanceMat.simulated.latitude <- rbind(distanceMat.simulated.latitude, hexgrid3_stem_centroids[which(summer.abundance>0),2][empiricalData_breedingHexagons3[i]] - unlist(winter.destinations) )
+	distanceMat.simulated.latitude <- rbind(distanceMat.simulated.latitude, hexgrid3_stem_centroids[which(summer.abundance>0),2][empiricalData_breedingHexagons3[i]] - matrix(unlist(winter.destinations), ncol=2, byrow=T)[,2] )
 }
 	
 aaa <- which(lapply(winter.destinations, length) == 0)
@@ -695,6 +699,8 @@ if(length(aaa)>0){
 	distanceMat.simulated.longitude <- distanceMat.simulated.longitude[-aaa,]
 	distanceMat.simulated.latitude <- distanceMat.simulated.latitude[-aaa,]
 	distanceMat.empirical <- distanceMat.empirical[-aaa,-aaa]
+	distanceMat.empirical.longitude <- distanceMat.empirical.longitude[-aaa,-aaa]
+	distanceMat.empirical.latitude <- distanceMat.empirical.latitude[-aaa,-aaa]
 }
 
 ##  Compute the Mantel correlation coefficients	##
@@ -931,13 +937,13 @@ for(i in 1:length(empiricalData_breedingHexagons3)){
 ##  Compute pairwise longitudinal difference between empirical breeding sites and corresponding simulated wintering sites  ##
 distanceMat.simulated.longitude <- vector()
 for(i in 1:length(empiricalData_breedingHexagons3)){
-	distanceMat.simulated.longitude <- rbind(distanceMat.simulated.longitude, hexgrid3_stem_centroids[which(summer.abundance>0),1][empiricalData_breedingHexagons3[i]] - unlist(winter.destinations) )
+	distanceMat.simulated.longitude <- rbind(distanceMat.simulated.longitude, hexgrid3_stem_centroids[which(summer.abundance>0),1][empiricalData_breedingHexagons3[i]] - matrix(unlist(winter.destinations), ncol=2, byrow=T)[,1] )
 }
 	
 ##  Compute pairwise latitudinal difference between empirical breeding sites and corresponding simulated wintering sites  ##
 distanceMat.simulated.latitude <- vector()
 for(i in 1:length(empiricalData_breedingHexagons3)){
-	distanceMat.simulated.latitude <- rbind(distanceMat.simulated.latitude, hexgrid3_stem_centroids[which(summer.abundance>0),2][empiricalData_breedingHexagons3[i]] - unlist(winter.destinations) )
+	distanceMat.simulated.latitude <- rbind(distanceMat.simulated.latitude, hexgrid3_stem_centroids[which(summer.abundance>0),2][empiricalData_breedingHexagons3[i]] - matrix(unlist(winter.destinations), ncol=2, byrow=T)[,2] )
 }
 	
 aaa <- which(lapply(winter.destinations, length) == 0)
@@ -947,6 +953,8 @@ if(length(aaa)>0){
 	distanceMat.simulated.longitude <- distanceMat.simulated.longitude[-aaa,]
 	distanceMat.simulated.latitude <- distanceMat.simulated.latitude[-aaa,]
 	distanceMat.empirical <- distanceMat.empirical[-aaa,-aaa]
+	distanceMat.empirical.longitude <- distanceMat.empirical.longitude[-aaa,-aaa]
+	distanceMat.empirical.latitude <- distanceMat.empirical.latitude[-aaa,-aaa]
 }
 
 ##  Compute the Mantel correlation coefficients	##
@@ -1161,13 +1169,13 @@ for(i in 1:length(empiricalData_breedingHexagons3)){
 ##  Compute pairwise longitudinal difference between empirical breeding sites and corresponding simulated wintering sites  ##
 distanceMat.simulated.longitude <- vector()
 for(i in 1:length(empiricalData_breedingHexagons3)){
-	distanceMat.simulated.longitude <- rbind(distanceMat.simulated.longitude, hexgrid3_stem_centroids[which(summer.abundance>0),1][empiricalData_breedingHexagons3[i]] - unlist(winter.destinations) )
+	distanceMat.simulated.longitude <- rbind(distanceMat.simulated.longitude, hexgrid3_stem_centroids[which(summer.abundance>0),1][empiricalData_breedingHexagons3[i]] - matrix(unlist(winter.destinations), ncol=2, byrow=T)[,1] )
 }
 	
 ##  Compute pairwise latitudinal difference between empirical breeding sites and corresponding simulated wintering sites  ##
 distanceMat.simulated.latitude <- vector()
 for(i in 1:length(empiricalData_breedingHexagons3)){
-	distanceMat.simulated.latitude <- rbind(distanceMat.simulated.latitude, hexgrid3_stem_centroids[which(summer.abundance>0),2][empiricalData_breedingHexagons3[i]] - unlist(winter.destinations) )
+	distanceMat.simulated.latitude <- rbind(distanceMat.simulated.latitude, hexgrid3_stem_centroids[which(summer.abundance>0),2][empiricalData_breedingHexagons3[i]] - matrix(unlist(winter.destinations), ncol=2, byrow=T)[,2] )
 }
 	
 aaa <- which(lapply(winter.destinations, length) == 0)
@@ -1177,6 +1185,8 @@ if(length(aaa)>0){
 	distanceMat.simulated.longitude <- distanceMat.simulated.longitude[-aaa,]
 	distanceMat.simulated.latitude <- distanceMat.simulated.latitude[-aaa,]
 	distanceMat.empirical <- distanceMat.empirical[-aaa,-aaa]
+	distanceMat.empirical.longitude <- distanceMat.empirical.longitude[-aaa,-aaa]
+	distanceMat.empirical.latitude <- distanceMat.empirical.latitude[-aaa,-aaa]
 }
 
 ##  Compute the Mantel correlation coefficients	##
@@ -1375,7 +1385,7 @@ for(j in 5:length(spp_sel)){
 	ptsBR <- ptsBR[toKeep,]
 	ptsNB <- ptsNB[toKeep,]
 
-		##  Compute pairwise distances between the sets of breeding and wintering locations of individuals in the empirical dataset  ##
+	##  Compute pairwise distances between the sets of breeding and wintering locations of individuals in the empirical dataset  ##
 	distanceMat.empirical <- vector() 
 	for(i in 1:length(empiricalData_breedingHexagons3)){	
 		distanceMat.empirical <- rbind(distanceMat.empirical, distHaversine( hexgrid3_stem_centroids[which(summer.abundance>0),][empiricalData_breedingHexagons3[i],] , 	hexgrid3_stem_centroids[which(winter.abundance>0),][empiricalData_nonbreedingHexagons3,] ) / 1000)
@@ -1412,13 +1422,13 @@ for(j in 5:length(spp_sel)){
 	##  Compute pairwise longitudinal difference between empirical breeding sites and corresponding simulated wintering sites  ##
 	distanceMat.simulated.longitude <- vector()
 	for(i in 1:length(empiricalData_breedingHexagons3)){
-		distanceMat.simulated.longitude <- rbind(distanceMat.simulated.longitude, hexgrid3_stem_centroids[which(summer.abundance>0),1][empiricalData_breedingHexagons3[i]] - unlist(winter.destinations) )
+		distanceMat.simulated.longitude <- rbind(distanceMat.simulated.longitude, hexgrid3_stem_centroids[which(summer.abundance>0),1][empiricalData_breedingHexagons3[i]] - matrix(unlist(winter.destinations), ncol=2, byrow=T)[,1] )
 	}
 	
 	##  Compute pairwise latitudinal difference between empirical breeding sites and corresponding simulated wintering sites  ##
 	distanceMat.simulated.latitude <- vector()
 	for(i in 1:length(empiricalData_breedingHexagons3)){
-		distanceMat.simulated.latitude <- rbind(distanceMat.simulated.latitude, hexgrid3_stem_centroids[which(summer.abundance>0),2][empiricalData_breedingHexagons3[i]] - unlist(winter.destinations) )
+		distanceMat.simulated.latitude <- rbind(distanceMat.simulated.latitude, hexgrid3_stem_centroids[which(summer.abundance>0),2][empiricalData_breedingHexagons3[i]] - matrix(unlist(winter.destinations), ncol=2, byrow=T)[,2] )
 	}
 	
 	aaa <- which(lapply(winter.destinations, length) == 0)
@@ -1428,6 +1438,8 @@ for(j in 5:length(spp_sel)){
 		distanceMat.simulated.longitude <- distanceMat.simulated.longitude[-aaa,]
 		distanceMat.simulated.latitude <- distanceMat.simulated.latitude[-aaa,]
 		distanceMat.empirical <- distanceMat.empirical[-aaa,-aaa]
+		distanceMat.empirical.longitude <- distanceMat.empirical.longitude[-aaa,-aaa]
+		distanceMat.empirical.latitude <- distanceMat.empirical.latitude[-aaa,-aaa]
 	}
 
 	##  Compute the Mantel correlation coefficients	##
@@ -1675,13 +1687,13 @@ for(i in 1:length(empiricalData_breedingHexagons3)){
 ##  Compute pairwise longitudinal difference between empirical breeding sites and corresponding simulated wintering sites  ##
 distanceMat.simulated.longitude <- vector()
 for(i in 1:length(empiricalData_breedingHexagons3)){
-	distanceMat.simulated.longitude <- rbind(distanceMat.simulated.longitude, hexgrid3_stem_centroids[which(summer.abundance>0),1][empiricalData_breedingHexagons3[i]] - unlist(winter.destinations) )
+	distanceMat.simulated.longitude <- rbind(distanceMat.simulated.longitude, hexgrid3_stem_centroids[which(summer.abundance>0),1][empiricalData_breedingHexagons3[i]] - matrix(unlist(winter.destinations), ncol=2, byrow=T)[,1] )
 }
 	
 ##  Compute pairwise latitudinal difference between empirical breeding sites and corresponding simulated wintering sites  ##
 distanceMat.simulated.latitude <- vector()
 for(i in 1:length(empiricalData_breedingHexagons3)){
-	distanceMat.simulated.latitude <- rbind(distanceMat.simulated.latitude, hexgrid3_stem_centroids[which(summer.abundance>0),2][empiricalData_breedingHexagons3[i]] - unlist(winter.destinations) )
+	distanceMat.simulated.latitude <- rbind(distanceMat.simulated.latitude, hexgrid3_stem_centroids[which(summer.abundance>0),2][empiricalData_breedingHexagons3[i]] - matrix(unlist(winter.destinations), ncol=2, byrow=T)[,2] )
 }
 	
 aaa <- which(lapply(winter.destinations, length) == 0)
@@ -1691,6 +1703,8 @@ if(length(aaa)>0){
 	distanceMat.simulated.longitude <- distanceMat.simulated.longitude[-aaa,]
 	distanceMat.simulated.latitude <- distanceMat.simulated.latitude[-aaa,]
 	distanceMat.empirical <- distanceMat.empirical[-aaa,-aaa]
+	distanceMat.empirical.longitude <- distanceMat.empirical.longitude[-aaa,-aaa]
+	distanceMat.empirical.latitude <- distanceMat.empirical.latitude[-aaa,-aaa]
 }
 
 ##  Compute the Mantel correlation coefficients	##
@@ -1925,13 +1939,13 @@ for(j in 2:length(spp_sel)){
 	##  Compute pairwise longitudinal difference between empirical breeding sites and corresponding simulated wintering sites  ##
 	distanceMat.simulated.longitude <- vector()
 	for(i in 1:length(empiricalData_breedingHexagons3)){
-		distanceMat.simulated.longitude <- rbind(distanceMat.simulated.longitude, hexgrid3_stem_centroids[which(summer.abundance>0),1][empiricalData_breedingHexagons3[i]] - unlist(winter.destinations) )
+		distanceMat.simulated.longitude <- rbind(distanceMat.simulated.longitude, hexgrid3_stem_centroids[which(summer.abundance>0),1][empiricalData_breedingHexagons3[i]] - matrix(unlist(winter.destinations), ncol=2, byrow=T)[,1] )
 	}
 	
 	##  Compute pairwise latitudinal difference between empirical breeding sites and corresponding simulated wintering sites  ##
 	distanceMat.simulated.latitude <- vector()
 	for(i in 1:length(empiricalData_breedingHexagons3)){
-		distanceMat.simulated.latitude <- rbind(distanceMat.simulated.latitude, hexgrid3_stem_centroids[which(summer.abundance>0),2][empiricalData_breedingHexagons3[i]] - unlist(winter.destinations) )
+		distanceMat.simulated.latitude <- rbind(distanceMat.simulated.latitude, hexgrid3_stem_centroids[which(summer.abundance>0),2][empiricalData_breedingHexagons3[i]] - matrix(unlist(winter.destinations), ncol=2, byrow=T)[,2] )
 	}
 	
 	aaa <- which(lapply(winter.destinations, length) == 0)
@@ -1941,6 +1955,8 @@ for(j in 2:length(spp_sel)){
 		distanceMat.simulated.longitude <- distanceMat.simulated.longitude[-aaa,]
 		distanceMat.simulated.latitude <- distanceMat.simulated.latitude[-aaa,]
 		distanceMat.empirical <- distanceMat.empirical[-aaa,-aaa]
+		distanceMat.empirical.longitude <- distanceMat.empirical.longitude[-aaa,-aaa]
+		distanceMat.empirical.latitude <- distanceMat.empirical.latitude[-aaa,-aaa]
 	}
 
 	##  Compute the Mantel correlation coefficients	##
@@ -2221,13 +2237,13 @@ for(i in 1:length(empiricalData_breedingHexagons3)){
 ##  Compute pairwise longitudinal difference between empirical breeding sites and corresponding simulated wintering sites  ##
 distanceMat.simulated.longitude <- vector()
 for(i in 1:length(empiricalData_breedingHexagons3)){
-	distanceMat.simulated.longitude <- rbind(distanceMat.simulated.longitude, hexgrid3_stem_centroids[which(summer.abundance>0),1][empiricalData_breedingHexagons3[i]] - unlist(winter.destinations) )
+	distanceMat.simulated.longitude <- rbind(distanceMat.simulated.longitude, hexgrid3_stem_centroids[which(summer.abundance>0),1][empiricalData_breedingHexagons3[i]] - matrix(unlist(winter.destinations), ncol=2, byrow=T)[,1] )
 }
 	
 ##  Compute pairwise latitudinal difference between empirical breeding sites and corresponding simulated wintering sites  ##
 distanceMat.simulated.latitude <- vector()
 for(i in 1:length(empiricalData_breedingHexagons3)){
-	distanceMat.simulated.latitude <- rbind(distanceMat.simulated.latitude, hexgrid3_stem_centroids[which(summer.abundance>0),2][empiricalData_breedingHexagons3[i]] - unlist(winter.destinations) )
+	distanceMat.simulated.latitude <- rbind(distanceMat.simulated.latitude, hexgrid3_stem_centroids[which(summer.abundance>0),2][empiricalData_breedingHexagons3[i]] - matrix(unlist(winter.destinations), ncol=2, byrow=T)[,2] )
 }
 	
 aaa <- which(lapply(winter.destinations, length) == 0)
@@ -2237,6 +2253,8 @@ if(length(aaa)>0){
 	distanceMat.simulated.longitude <- distanceMat.simulated.longitude[-aaa,]
 	distanceMat.simulated.latitude <- distanceMat.simulated.latitude[-aaa,]
 	distanceMat.empirical <- distanceMat.empirical[-aaa,-aaa]
+	distanceMat.empirical.longitude <- distanceMat.empirical.longitude[-aaa,-aaa]
+	distanceMat.empirical.latitude <- distanceMat.empirical.latitude[-aaa,-aaa]
 }
 
 ##  Compute the Mantel correlation coefficients	##
@@ -2471,13 +2489,13 @@ for(j in 2:length(spp_sel)){
 	##  Compute pairwise longitudinal difference between empirical breeding sites and corresponding simulated wintering sites  ##
 	distanceMat.simulated.longitude <- vector()
 	for(i in 1:length(empiricalData_breedingHexagons3)){
-		distanceMat.simulated.longitude <- rbind(distanceMat.simulated.longitude, hexgrid3_stem_centroids[which(summer.abundance>0),1][empiricalData_breedingHexagons3[i]] - unlist(winter.destinations) )
+		distanceMat.simulated.longitude <- rbind(distanceMat.simulated.longitude, hexgrid3_stem_centroids[which(summer.abundance>0),1][empiricalData_breedingHexagons3[i]] - matrix(unlist(winter.destinations), ncol=2, byrow=T)[,1] )
 	}
 	
 	##  Compute pairwise latitudinal difference between empirical breeding sites and corresponding simulated wintering sites  ##
 	distanceMat.simulated.latitude <- vector()
 	for(i in 1:length(empiricalData_breedingHexagons3)){
-		distanceMat.simulated.latitude <- rbind(distanceMat.simulated.latitude, hexgrid3_stem_centroids[which(summer.abundance>0),2][empiricalData_breedingHexagons3[i]] - unlist(winter.destinations) )
+		distanceMat.simulated.latitude <- rbind(distanceMat.simulated.latitude, hexgrid3_stem_centroids[which(summer.abundance>0),2][empiricalData_breedingHexagons3[i]] - matrix(unlist(winter.destinations), ncol=2, byrow=T)[,2] )
 	}
 	
 	aaa <- which(lapply(winter.destinations, length) == 0)
@@ -2487,6 +2505,8 @@ for(j in 2:length(spp_sel)){
 		distanceMat.simulated.longitude <- distanceMat.simulated.longitude[-aaa,]
 		distanceMat.simulated.latitude <- distanceMat.simulated.latitude[-aaa,]
 		distanceMat.empirical <- distanceMat.empirical[-aaa,-aaa]
+		distanceMat.empirical.longitude <- distanceMat.empirical.longitude[-aaa,-aaa]
+		distanceMat.empirical.latitude <- distanceMat.empirical.latitude[-aaa,-aaa]
 	}
 
 	##  Compute the Mantel correlation coefficients	##
