@@ -2082,6 +2082,7 @@ for(j in 2:length(spp_sel)){
 		nullModel.abund.r[k] <- mantel.rtest(as.dist(distanceMat.nullabund, upper=T), as.dist(distanceMat.empirical, upper=T), nrepet=0)
 		nullModel.abund.r.longitude[k] <- mantel.rtest(as.dist(distanceMat.nullabund.longitude, upper=T), as.dist(distanceMat.empirical.longitude, upper=T), nrepet=0)
 		nullModel.abund.r.latitude[k] <- mantel.rtest(as.dist(distanceMat.nullabund.latitude, upper=T), as.dist(distanceMat.empirical.latitude, upper=T), nrepet=0)
+		
 	}
 	nullModel.r.all[[spp_sel[j]]] <- nullModel.r
 	nullModel.abund.r.all[[spp_sel[j]]] <- nullModel.abund.r
