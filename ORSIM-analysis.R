@@ -1942,44 +1942,44 @@ ORSIM_results <- read.csv(paste("ORSIM-outputs/ORSIMresults_", spp[spp_sel[j]], 
 ORSIM_flows <- ORSIM_results[which(summer.abundance>0), which(winter.abundance>0)]
 
 ##  Get empirical migration data (location of breeding and wintering sites of individuals) for the species from genetic data  ##
-wintering.assignments <- readRDS("Data/Genoscapes/CommonLoon/COLO.WinteringAssignment.rds")
-wintering.surfaces.origen <- readRDS("Data/Genoscapes/CommonLoon/COLO_WinterProbSurfaces.rds")
-breeding_origen <- vector()
-for(k in 3:length(colnames(wintering.surfaces.origen))){
-	breeding_origen[k] <- which(wintering.surfaces.origen[,k] == max(wintering.surfaces.origen[,k]))
-}
-breeding_origen <- breeding_origen[-c(1,2)]
-wintering_origen <- vector()
-for(k in 3:length(colnames(wintering.surfaces.origen))){
-	if(length(which(wintering.assignments$indiv == colnames(wintering.surfaces.origen)[k])) > 0){
-		wintering_origen[k] <- which(wintering.assignments$indiv == colnames(wintering.surfaces.origen)[k])
-	}else{
-		wintering_origen[k] <- NA
-	}
-}
-wintering_origen <- wintering_origen[-c(1,2)]
-toRemove <- which(is.na(wintering_origen) == T)
-if(length(toRemove)>0){
-	wintering_origen <- wintering_origen[-toRemove]
-	breeding_origen <- breeding_origen[-toRemove]
-}
+#wintering.assignments <- readRDS("Data/Genoscapes/CommonLoon/COLO.WinteringAssignment.rds")
+#wintering.surfaces.origen <- readRDS("Data/Genoscapes/CommonLoon/COLO_WinterProbSurfaces.rds")
+#breeding_origen <- vector()
+#for(k in 3:length(colnames(wintering.surfaces.origen))){
+#	breeding_origen[k] <- which(wintering.surfaces.origen[,k] == max(wintering.surfaces.origen[,k]))
+#}
+#breeding_origen <- breeding_origen[-c(1,2)]
+#wintering_origen <- vector()
+#for(k in 3:length(colnames(wintering.surfaces.origen))){
+#	if(length(which(wintering.assignments$indiv == colnames(wintering.surfaces.origen)[k])) > 0){
+#		wintering_origen[k] <- which(wintering.assignments$indiv == colnames(wintering.surfaces.origen)[k])
+#	}else{
+#		wintering_origen[k] <- NA
+#	}
+#}
+#wintering_origen <- wintering_origen[-c(1,2)]
+#toRemove <- which(is.na(wintering_origen) == T)
+#if(length(toRemove)>0){
+#	wintering_origen <- wintering_origen[-toRemove]
+#	breeding_origen <- breeding_origen[-toRemove]
+#}
 
 ##  Get hexagons containing the empirical breeding and wintering locations of individuals from genetic data  ## 
-ptsBR1 <- as.matrix(wintering.surfaces.origen[,1:2][breeding_origen,])
-sptsBR <- SpatialPoints(ptsBR1)
-proj4string(sptsBR) <- proj4string(hexgrid3_stem)
-breedingPoints_inHexagons <- gContains(hexgrid3_stem[which(summer.abundance>0),], sptsBR, byid=T)
-breedingHexagons <- apply(breedingPoints_inHexagons, 1, function(x) which(x==TRUE))
+#ptsBR1 <- as.matrix(wintering.surfaces.origen[,1:2][breeding_origen,])
+#sptsBR <- SpatialPoints(ptsBR1)
+#proj4string(sptsBR) <- proj4string(hexgrid3_stem)
+#breedingPoints_inHexagons <- gContains(hexgrid3_stem[which(summer.abundance>0),], sptsBR, byid=T)
+#breedingHexagons <- apply(breedingPoints_inHexagons, 1, function(x) which(x==TRUE))
 
-ptsNB1 <- as.matrix(wintering.assignments[,5:4][wintering_origen,])
-sptsNB <- SpatialPoints(ptsNB1)
-proj4string(sptsNB) <- proj4string(hexgrid3_stem)
-winteringPoints_inHexagons <- gContains(hexgrid3_stem[which(winter.abundance>0),], sptsNB, byid=T)
-winteringHexagons <- apply(winteringPoints_inHexagons, 1, function(x) which(x==TRUE))
+#ptsNB1 <- as.matrix(wintering.assignments[,5:4][wintering_origen,])
+#sptsNB <- SpatialPoints(ptsNB1)
+#proj4string(sptsNB) <- proj4string(hexgrid3_stem)
+#winteringPoints_inHexagons <- gContains(hexgrid3_stem[which(winter.abundance>0),], sptsNB, byid=T)
+#winteringHexagons <- apply(winteringPoints_inHexagons, 1, function(x) which(x==TRUE))
 
-toKeep <- which(lapply(breedingHexagons, length) > 0 & lapply(winteringHexagons, length) > 0)
-empiricalData_breedingHexagons_gen <- unlist(breedingHexagons[toKeep])
-empiricalData_nonbreedingHexagons_gen <- unlist(winteringHexagons[toKeep])
+#toKeep <- which(lapply(breedingHexagons, length) > 0 & lapply(winteringHexagons, length) > 0)
+#empiricalData_breedingHexagons_gen <- unlist(breedingHexagons[toKeep])
+#empiricalData_nonbreedingHexagons_gen <- unlist(winteringHexagons[toKeep])
 
 ##  Get empirical migration data for the species from banding data  ##
 ptsBR2 <- vector()
@@ -2011,12 +2011,18 @@ proj4string(sp.ptsNB) <- sr
 empiricalData_nonbreedingHexagons_band <- over(sp.ptsNB, hexgrid3_stem[which(winter.abundance>0),])
 
 ##  Combine hexagons containing the empirical breeding and wintering locations of individuals from both genetic and banding data  ##
-empiricalData_breedingHexagons <- c(empiricalData_breedingHexagons_gen, empiricalData_breedingHexagons_band)
+#empiricalData_breedingHexagons <- c(empiricalData_breedingHexagons_gen, empiricalData_breedingHexagons_band)
+#empiricalData_breedingHexagons2 <- unique(empiricalData_breedingHexagons[which(is.na(empiricalData_breedingHexagons)==FALSE)])
+#empiricalData_nonbreedingHexagons <- c(empiricalData_nonbreedingHexagons_gen, empiricalData_nonbreedingHexagons_band)
+#empiricalData_nonbreedingHexagons2 <- unique(empiricalData_nonbreedingHexagons[which(is.na(empiricalData_nonbreedingHexagons)==FALSE)])
+#ptsBR <- rbind(ptsBR1, ptsBR2)
+#ptsNB <- rbind(ptsNB1, ptsNB2)
+empiricalData_breedingHexagons <- empiricalData_breedingHexagons_band
 empiricalData_breedingHexagons2 <- unique(empiricalData_breedingHexagons[which(is.na(empiricalData_breedingHexagons)==FALSE)])
-empiricalData_nonbreedingHexagons <- c(empiricalData_nonbreedingHexagons_gen, empiricalData_nonbreedingHexagons_band)
+empiricalData_nonbreedingHexagons <- empiricalData_nonbreedingHexagons_band
 empiricalData_nonbreedingHexagons2 <- unique(empiricalData_nonbreedingHexagons[which(is.na(empiricalData_nonbreedingHexagons)==FALSE)])
-ptsBR <- rbind(ptsBR1, ptsBR2)
-ptsNB <- rbind(ptsNB1, ptsNB2)
+ptsBR <- ptsBR2
+ptsNB <- ptsNB2
 
 ##  Only keep individuals for which both breeding and wintering locations fall within an hexagon occupied by the species (i.e. with a seasonal relative abundance > 0) ##
 toKeep <- which(is.na(empiricalData_breedingHexagons) == F & is.na(empiricalData_nonbreedingHexagons) == F)

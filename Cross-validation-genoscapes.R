@@ -130,7 +130,7 @@ distance.error.COLO <- distance.error.COLO[-c(1,2)]
 
 ##  FIGURE S12: results of cross-validation  ##
 
-par(mfrow=c(2,3), mar=c(3,3,3,1), mgp=c(2,1,0), bg="white")
+par(mfrow=c(2,2), mar=c(3,3,3,1), mgp=c(2,1,0), bg="white")
 
 hist(distance.error.COYE, xlab="Error distance (km)", col="light grey", breaks=20, border="grey", main="Common Yellowthroat")
 abline(v=mean(distance.error.COYE, na.rm=T))
@@ -140,8 +140,8 @@ hist(distance.error.YEWA, xlab="Error distance (km)", col="light grey", breaks=2
 abline(v=mean(distance.error.YEWA, na.rm=T))
 hist(distance.error.WIWA, xlab="Error distance (km)", col="light grey", breaks=20, border="grey", main="Wilson's Warbler")
 abline(v=mean(distance.error.WIWA, na.rm=T))
-hist(distance.error.COLO, xlab="Error distance (km)", col="light grey", breaks=20, border="grey", main="Common Loon")
-abline(v=mean(distance.error.COLO, na.rm=T))
+#hist(distance.error.COLO, xlab="Error distance (km)", col="light grey", breaks=20, border="grey", main="Common Loon")
+#abline(v=mean(distance.error.COLO, na.rm=T))
 
 
 
