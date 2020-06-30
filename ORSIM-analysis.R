@@ -652,15 +652,15 @@ spp_sel <- spp_sel_all[spp_sel1]
 
 # Load Mantel correlation coefficients resulting from ORSIM for all species
 load("ideal-optimal-redistribution/nullSimulations.RData")
-ORSIM.r.sel <- ORSIM.r[spp_sel1]
+ORSIM.r.sel <- ORSIM.r[spp_sel]
 
 # Test the effect of data source on the results 
-dataSource <- c("T", "T", "BT", "B", "B", "B", "G", "G", "G", "T", "T", "B", "G", "B", "B", "B", "B", "B", "BG", "B", "T", "B", "B", "BT") # T: tracking data; B: banding data; G: genetic data; BT: mix of banding and tracking data; BG: mix of banding and genetic data
-summary(aov(R2 ~ dataSource))
+dataSource <- c("T", "T", "BT", "B", "B", "B", "G", "G", "G", "T", "T", "B", "G", "B", "B", "B", "B", "B", "B", "B", "T", "B", "B", "BT") # T: tracking data; B: banding data; G: genetic data; BT: mix of banding and tracking data
+summary(aov(ORSIM.r.sel ~ dataSource))
 
 # Test the effect of sample size on the results 
-sampleSize <- c(102, 22, 10, 872, 211, 358, 178, 91, 232, 17, 53, 18, 261, 94, 29, 530, 2737, 482, 161, 19, 26, 278, 12, 413) # Number of individuals used to map migratory connectivity
-summary(lm(R2 ~ sampleSize)) 
+sampleSize <- c(102, 22, 10, 872, 211, 358, 178, 91, 232, 17, 53, 18, 261, 94, 29, 530, 2737, 482, 82, 19, 26, 278, 12, 413) # Number of individuals used to map migratory connectivity
+summary(lm(ORSIM.r.sel ~ sampleSize)) 
 
 # Compute seasonal range size, seasonal range overlap and seasonal range size difference
 rangeSizeBR <- vector()
@@ -675,10 +675,10 @@ for(j in 1:length(spp_sel)){
 }
 rangeSizeDifference <- rangeSizeNB / rangeSizeBR
 
-summary(lm(R2 ~ rangeSizeBR))  # Test the effect of breeding range size
-summary(lm(R2 ~ rangeSizeNB))  # Test the effect of wintering range size
-summary(lm(R2 ~ rangeSizeDifference))  # Test the effect of range size difference
-summary(lm(R2 ~ rangeOverlap))  # Test the effect of range overlap
+summary(lm(ORSIM.r.sel ~ rangeSizeBR))  # Test the effect of breeding range size
+summary(lm(ORSIM.r.sel ~ rangeSizeNB))  # Test the effect of wintering range size
+summary(lm(ORSIM.r.sel ~ rangeSizeDifference))  # Test the effect of range size difference
+summary(lm(ORSIM.r.sel ~ rangeOverlap))  # Test the effect of range overlap
 
 
 
