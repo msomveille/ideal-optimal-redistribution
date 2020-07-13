@@ -241,7 +241,8 @@ spp_sel1 <- c(16,13,20)
 spp_sel <- spp_sel_all[spp_sel1]
 
 # Plot the figure
-pdf("Manuscript/Figures/Fig2_mantel.pdf", width=12, height=10)
+#pdf("Manuscript/Science/Figures/Fig2.pdf", width=12, height=10)
+png("Manuscript/Science/Figures/Fig2.png", width=1200, height=1000, unit="px",res=100)
 par(mfrow=c(3,3), mar=c(0.1,0.1,0.1,0.1), mgp=c(2,1,0), bg="white")
 
 # Ovenbird
@@ -367,10 +368,12 @@ mtext("(b)", side=3, line=0.5, at=-175, cex=1.3)
 title("Simulated connectivity", line=1, cex.main=2)
 
 # Simulated versus empirical
-plot(as.vector(distanceMat.empirical), as.vector(distanceMat.simulatedBR), pch=20, cex=0.8, axes=F, main=NULL, ylab="Simulated", xlab="Empirical")
+plot(as.vector(distanceMat.empirical), as.vector(distanceMat.simulatedBR), pch=20, cex=0.8, axes=F, main=NULL, ylab="", xlab="")
 axis(side=1)
 axis(side=2)
 abline(lm(as.vector(distanceMat.simulatedBR) ~ as.vector(distanceMat.empirical)), col="red", lwd=2)
+mtext("Empirical", side=1, line=2.3, at=3000, cex=1.2)
+mtext("Simulated", side=2, line=2, at=3000, cex=1.2)
 mtext("(c)", side=3, line=0.5, at=700, cex=1.3)
 mtext(bquote('r'["M"]*' = '* .(round(ORSIM.rM,3))), side=1, line=-1.3, at=4400, cex=1.4)
 title("Simulated vs. empirical", line=1, cex.main=2)	
@@ -492,10 +495,12 @@ mtext("(e)", side=3, line=0.5, at=-175, cex=1.3)
 title("Simulated connectivity", line=1, cex.main=2)
 
 # Simulated versus empirical
-plot(as.vector(distanceMat.empirical), as.vector(distanceMat.simulatedBR), pch=20, cex=0.8, axes=F, main=NULL, ylab="Simulated", xlab="Empirical")
+plot(as.vector(distanceMat.empirical), as.vector(distanceMat.simulatedBR), pch=20, cex=0.8, axes=F, main=NULL, ylab="", xlab="")
 axis(side=1)
 axis(side=2)
 abline(lm(as.vector(distanceMat.simulatedBR) ~ as.vector(distanceMat.empirical)), col="red", lwd=2)
+mtext("Empirical", side=1, line=2.3, at=2500, cex=1.2)
+mtext("Simulated", side=2, line=2, at=2500, cex=1.2)
 mtext("(f)", side=3, line=0.5, at=700, cex=1.3)
 mtext(bquote('r'["M"]*' = '* .(round(ORSIM.rM,3))), side=1, line=-1.3, at=4400, cex=1.4)
 title("Simulated vs. empirical", line=1, cex.main=2)		
@@ -627,12 +632,14 @@ mtext("(h)", side=3, line=0.5, at=-175, cex=1.3)
 title("Simulated connectivity", line=1, cex.main=2)
 
 # Simulated versus empirical
-plot(as.vector(distanceMat.empirical), as.vector(distanceMat.simulatedBR), pch=20, cex=0.8, axes=F, main=NULL, ylab="Simulated", xlab="Empirical")
+plot(as.vector(distanceMat.empirical), as.vector(distanceMat.simulatedBR), pch=20, cex=0.8, axes=F, main=NULL, ylab="", xlab="")
 axis(side=1)
 axis(side=2)
 abline(lm(as.vector(distanceMat.simulatedBR) ~ as.vector(distanceMat.empirical)), col="red", lwd=2)
+mtext("Empirical", side=1, line=2.3, at=5000, cex=1.2)
+mtext("Simulated", side=2, line=2, at=5000, cex=1.2)
 mtext("(i)", side=3, line=0.5, at=700, cex=1.3)
-mtext(bquote('r'["M"]*' = '* .(round(ORSIM.rM,3))), side=1, line=-1.3, at=4400, cex=1.4)
+mtext(bquote('r'["M"]*' = '* .(round(ORSIM.rM,3))), side=1, line=-1.3, at=7600, cex=1.4)
 title("Simulated vs. empirical", line=1, cex.main=2)	
 	
 dev.off()	
@@ -694,7 +701,8 @@ spp_sel1 <- c(1,3,4,6,9,13)
 spp_sel <- spp_sel_all[spp_sel1]
 
 # Plot the figure
-pdf("Manuscript/Figures/FigS2.pdf", width=12, height=20)
+#pdf("Manuscript/Science/Figures/FigS2.pdf", width=12, height=20)
+png("Manuscript/Science/Figures/FigS2.png", width=1200, height=2000, unit="px",res=100)
 par(mfrow=c(6,3), mar=c(2,0.1,0.1,0.1), mgp=c(1.9,0.7,0), bg="white")
 
 panel <- c("(a)", "(b)", "(c)", "(d)", "(e)", "(f)", "(g)", "(h)", "(i)", "(j)", "(k)", "(l)", "(m)", "(n)", "(o)", "(p)", "(q)", "(r)")
@@ -825,10 +833,12 @@ mtext(panel[(j+(2*(j-1))+1)], side=3, line=0.5, at=-175, cex=1.3)
 title("Simulated connectivity", line=1, cex.main=2.2)
 
 # Simulated versus empirical
-plot(as.vector(distanceMat.empirical), as.vector(distanceMat.simulatedBR), pch=20, cex=0.8, axes=F, main=NULL, ylab="Simulated", xlab="Empirical", xlim=c(0,7000), ylim=c(0,7000), cex.lab=1.5)
+plot(as.vector(distanceMat.empirical), as.vector(distanceMat.simulatedBR), pch=20, cex=0.8, axes=F, main=NULL, ylab="", xlab="", xlim=c(0,7000), ylim=c(0,7000), cex.lab=1.5)
 axis(side=1)
 axis(side=2)
 abline(lm(as.vector(distanceMat.simulatedBR) ~ as.vector(distanceMat.empirical)), col="red", lwd=2)
+mtext("Empirical", side=1, line=2.3, at=3500, cex=1.2)
+mtext("Simulated", side=2, line=2, at=3500, cex=1.2)
 mtext(panel[(j+(2*(j-1))+2)], side=3, line=0.5, at=-500, cex=1.3)
 mtext(bquote('r'["M"]*' = '* .(round(ORSIM.rM,3))), side=1, line=-1.3, at=5700, cex=1.4)
 title("Simulated vs. empirical", line=1, cex.main=2.2)	
@@ -957,10 +967,12 @@ for(j in 2:length(spp_sel)){
 	mtext(panel[(j+(2*(j-1))+1)], side=3, line=0.5, at=-175, cex=1.3)
 
 	# Simulated versus empirical
-	plot(as.vector(distanceMat.empirical), as.vector(distanceMat.simulatedBR), pch=20, cex=0.8, axes=F, main=NULL, ylab="Simulated", xlab="Empirical", xlim=c(0,7000), ylim=c(0,7000), cex.lab=1.5)
+	plot(as.vector(distanceMat.empirical), as.vector(distanceMat.simulatedBR), pch=20, cex=0.8, axes=F, main=NULL, ylab="", xlab="", xlim=c(0,7000), ylim=c(0,7000), cex.lab=1.5)
 	axis(side=1)
 	axis(side=2)
 	abline(lm(as.vector(distanceMat.simulatedBR) ~ as.vector(distanceMat.empirical)), col="red", lwd=2)
+	mtext("Empirical", side=1, line=2.3, at=3500, cex=1.2)
+	mtext("Simulated", side=2, line=2, at=3500, cex=1.2)
 	mtext(panel[(j+(2*(j-1))+2)], side=3, line=0.5, at=-500, cex=1.3)
 	mtext(bquote('r'["M"]*' = '* .(round(ORSIM.rM,3))), side=1, line=-1.3, at=5700, cex=1.4)	
 }
@@ -978,7 +990,8 @@ spp_sel1 <- c(20,26,28,22,16,15)
 spp_sel <- spp_sel_all[spp_sel1]
 	
 # Plot the figure
-pdf("Manuscript/Figures/FigS3.pdf", width=12, height=20)
+#pdf("Manuscript/Figures/FigS3.pdf", width=12, height=20)
+png("Manuscript/Science/Figures/FigS3.png", width=1200, height=2000, unit="px",res=100)
 par(mfrow=c(6,3), mar=c(2,0.1,0.1,0.1), mgp=c(1.9,0.7,0), bg="white")
 
 panel <- c("(a)", "(b)", "(c)", "(d)", "(e)", "(f)", "(g)", "(h)", "(i)", "(j)", "(k)", "(l)", "(m)", "(n)", "(o)", "(p)", "(q)", "(r)")
@@ -1112,10 +1125,12 @@ mtext(panel[(j+(2*(j-1))+1)], side=3, line=0.5, at=-175, cex=1.3)
 title("Simulated connectivity", line=1, cex.main=2)
 
 # Simulated versus empirical
-plot(as.vector(distanceMat.empirical), as.vector(distanceMat.simulatedBR), pch=20, cex=0.8, axes=F, main=NULL, ylab="Simulated", xlab="Empirical", xlim=c(0,10000), ylim=c(0,10000), cex.lab=1.5)
+plot(as.vector(distanceMat.empirical), as.vector(distanceMat.simulatedBR), pch=20, cex=0.8, axes=F, main=NULL, ylab="", xlab="", xlim=c(0,10000), ylim=c(0,10000), cex.lab=1.5)
 axis(side=1)
 axis(side=2)
 abline(lm(as.vector(distanceMat.simulatedBR) ~ as.vector(distanceMat.empirical)), col="red", lwd=2)
+mtext("Empirical", side=1, line=2.3, at=5000, cex=1.2)
+mtext("Simulated", side=2, line=2, at=5000, cex=1.2)
 mtext(panel[(j+(2*(j-1))+2)], side=3, line=0.5, at=-500, cex=1.3)
 mtext(bquote('r'["M"]*' = '* .(round(ORSIM.rM,3))), side=1, line=-1.3, at=8000, cex=1.4)
 title("Simulated vs. empirical", line=1, cex.main=2.2)	
@@ -1236,9 +1251,11 @@ for(i in 1:length(empiricalData_breedingHexagons3)){
 mtext(panel[(j+(2*(j-1))+1)], side=3, line=0.5, at=-175, cex=1.3)
 
 # Simulated versus empirical
-plot(as.vector(distanceMat.empirical), as.vector(distanceMat.simulatedBR), pch=20, cex=0.8, axes=F, main=NULL, ylab="Simulated", xlab="Empirical", xlim=c(0,8000), ylim=c(0,8000), cex.lab=1.5)
+plot(as.vector(distanceMat.empirical), as.vector(distanceMat.simulatedBR), pch=20, cex=0.8, axes=F, main=NULL, ylab="", xlab="", xlim=c(0,8000), ylim=c(0,8000), cex.lab=1.5)
 axis(side=1)
 axis(side=2)
+mtext("Empirical", side=1, line=2.3, at=4000, cex=1.2)
+mtext("Simulated", side=2, line=2, at=4000, cex=1.2)
 abline(lm(as.vector(distanceMat.simulatedBR) ~ as.vector(distanceMat.empirical)), col="red", lwd=2)
 mtext(panel[(j+(2*(j-1))+2)], side=3, line=0.5, at=-500, cex=1.3)
 mtext(bquote('r'["M"]*' = '* .(round(ORSIM.rM,3))), side=1, line=-1.3, at=6500, cex=1.4)
@@ -1370,10 +1387,12 @@ for(i in 1:length(empiricalData_breedingHexagons3)){
 mtext(panel[(j+(2*(j-1))+1)], side=3, line=0.5, at=-175, cex=1.3)
 
 # Simulated versus empirical
-plot(as.vector(distanceMat.empirical), as.vector(distanceMat.simulatedBR), pch=20, cex=0.8, axes=F, main=NULL, ylab="Simulated", xlab="Empirical", xlim=c(0,10000), ylim=c(0,10000), cex.lab=1.5)
+plot(as.vector(distanceMat.empirical), as.vector(distanceMat.simulatedBR), pch=20, cex=0.8, axes=F, main=NULL, ylab="", xlab="", xlim=c(0,10000), ylim=c(0,10000), cex.lab=1.5)
 axis(side=1)
 axis(side=2)
 abline(lm(as.vector(distanceMat.simulatedBR) ~ as.vector(distanceMat.empirical)), col="red", lwd=2)
+mtext("Empirical", side=1, line=2.3, at=5000, cex=1.2)
+mtext("Simulated", side=2, line=2, at=5000, cex=1.2)
 mtext(panel[(j+(2*(j-1))+2)], side=3, line=0.5, at=-500, cex=1.3)
 mtext(bquote('r'["M"]*' = '* .(round(ORSIM.rM,3))), side=1, line=-1.3, at=8000, cex=1.4)
 
@@ -1483,10 +1502,12 @@ mtext(panel[(j+(2*(j-1))+1)], side=3, line=0.5, at=-175, cex=1.3)
 title("Simulated connectivity", line=1, cex.main=2.2)
 
 # Simulated versus empirical
-plot(as.vector(distanceMat.empirical), as.vector(distanceMat.simulatedBR), pch=20, cex=0.8, axes=F, main=NULL, ylab="Simulated", xlab="Empirical", xlim=c(0,7000), ylim=c(0,7000), cex.lab=1.5)
+plot(as.vector(distanceMat.empirical), as.vector(distanceMat.simulatedBR), pch=20, cex=0.8, axes=F, main=NULL, ylab="", xlab="", xlim=c(0,7000), ylim=c(0,7000), cex.lab=1.5)
 axis(side=1)
 axis(side=2)
 abline(lm(as.vector(distanceMat.simulatedBR) ~ as.vector(distanceMat.empirical)), col="red", lwd=2)
+mtext("Empirical", side=1, line=2.3, at=3500, cex=1.2)
+mtext("Simulated", side=2, line=2, at=3500, cex=1.2)
 mtext(panel[(j+(2*(j-1))+2)], side=3, line=0.5, at=-500, cex=1.3)
 mtext(bquote('r'["M"]*' = '* .(round(ORSIM.rM,3))), side=1, line=-1.3, at=5700, cex=1.4)
 title("Simulated vs. empirical", line=1, cex.main=2.2)
@@ -1616,10 +1637,12 @@ for(j in 5:length(spp_sel)){
 	mtext(panel[(j+(2*(j-1))+1)], side=3, line=0.5, at=-175, cex=1.3)
 
 	# Simulated versus empirical
-	plot(as.vector(distanceMat.empirical), as.vector(distanceMat.simulatedBR), pch=20, cex=0.8, axes=F, main=NULL, ylab="Simulated", xlab="Empirical", xlim=c(0,7000), ylim=c(0,7000), cex.lab=1.5)
+	plot(as.vector(distanceMat.empirical), as.vector(distanceMat.simulatedBR), pch=20, cex=0.8, axes=F, main=NULL, ylab="", xlab="", xlim=c(0,7000), ylim=c(0,7000), cex.lab=1.5)
 	axis(side=1)
 	axis(side=2)
 	abline(lm(as.vector(distanceMat.simulatedBR) ~ as.vector(distanceMat.empirical)), col="red", lwd=2)
+	mtext("Empirical", side=1, line=2.3, at=3500, cex=1.2)
+	mtext("Simulated", side=2, line=2, at=3500, cex=1.2)
 	mtext(panel[(j+(2*(j-1))+2)], side=3, line=0.5, at=-500, cex=1.3)
 	mtext(bquote('r'["M"]*' = '* .(round(ORSIM.rM,3))), side=1, line=-1.3, at=5700, cex=1.4)	
 }
@@ -1637,7 +1660,8 @@ spp_sel1 <- c(27,11,19,10,12,14)
 spp_sel <- spp_sel_all[spp_sel1]
 	
 # Plot the figure
-pdf("Manuscript/Figures/FigS4.pdf", width=12, height=20)
+#pdf("Manuscript/Figures/FigS4.pdf", width=12, height=20)
+png("Manuscript/Science/Figures/FigS4.png", width=1200, height=2000, unit="px",res=100)
 par(mfrow=c(6,3), mar=c(2,0.1,0.1,0.1), mgp=c(1.9,0.7,0), bg="white")
 
 panel <- c("(a)", "(b)", "(c)", "(d)", "(e)", "(f)", "(g)", "(h)", "(i)", "(j)", "(k)", "(l)", "(m)", "(n)", "(o)", "(p)", "(q)", "(r)")
@@ -1771,10 +1795,12 @@ mtext(panel[(j+(2*(j-1))+1)], side=3, line=0.5, at=-175, cex=1.3)
 title("Simulated connectivity", line=1, cex.main=2.2)
 
 # Simulated versus empirical
-plot(as.vector(distanceMat.empirical), as.vector(distanceMat.simulatedBR), pch=20, cex=0.8, axes=F, main=NULL, ylab="Simulated", xlab="Empirical", xlim=c(0,7000), ylim=c(0,7000), cex.lab=1.5)
+plot(as.vector(distanceMat.empirical), as.vector(distanceMat.simulatedBR), pch=20, cex=0.8, axes=F, main=NULL, ylab="", xlab="", xlim=c(0,7000), ylim=c(0,7000), cex.lab=1.5)
 axis(side=1)
 axis(side=2)
 abline(lm(as.vector(distanceMat.simulatedBR) ~ as.vector(distanceMat.empirical)), col="red", lwd=2)
+mtext("Empirical", side=1, line=2.3, at=3500, cex=1.2)
+mtext("Simulated", side=2, line=2, at=3500, cex=1.2)
 mtext(panel[(j+(2*(j-1))+2)], side=3, line=0.5, at=-500, cex=1.3)
 mtext(bquote('r'["M"]*' = '* .(round(ORSIM.rM,3))), side=1, line=-1.3, at=5700, cex=1.4)
 title("Simulated vs. empirical", line=1, cex.main=2.2)	
@@ -1903,10 +1929,12 @@ for(j in 2:length(spp_sel)){
 	mtext(panel[(j+(2*(j-1))+1)], side=3, line=0.5, at=-175, cex=1.3)
 
 	# Simulated versus empirical
-	plot(as.vector(distanceMat.empirical), as.vector(distanceMat.simulatedBR), pch=20, cex=0.8, axes=F, main=NULL, ylab="Simulated", xlab="Empirical", xlim=c(0,7000), ylim=c(0,7000), cex.lab=1.5)
+	plot(as.vector(distanceMat.empirical), as.vector(distanceMat.simulatedBR), pch=20, cex=0.8, axes=F, main=NULL, ylab="", xlab="", xlim=c(0,7000), ylim=c(0,7000), cex.lab=1.5)
 	axis(side=1)
 	axis(side=2)
 	abline(lm(as.vector(distanceMat.simulatedBR) ~ as.vector(distanceMat.empirical)), col="red", lwd=2)
+	mtext("Empirical", side=1, line=2.3, at=3500, cex=1.2)
+	mtext("Simulated", side=2, line=2, at=3500, cex=1.2)
 	mtext(panel[(j+(2*(j-1))+2)], side=3, line=0.5, at=-500, cex=1.3)
 	mtext(bquote('r'["M"]*' = '* .(round(ORSIM.rM,3))), side=1, line=-1.3, at=5700, cex=1.4)	
 }
@@ -1923,7 +1951,8 @@ spp_sel1 <- c(7,2,18,5,8,17)
 spp_sel <- spp_sel_all[spp_sel1]
 	
 # Plot the figure
-pdf("Manuscript/Figures/FigS5.pdf", width=12, height=20)
+#pdf("Manuscript/Figures/FigS5.pdf", width=12, height=20)
+png("Manuscript/Science/Figures/FigS5.png", width=1200, height=2000, unit="px",res=100)
 par(mfrow=c(6,3), mar=c(2,0.1,0.1,0.1), mgp=c(1.9,0.7,0), bg="white")
 
 panel <- c("(a)", "(b)", "(c)", "(d)", "(e)", "(f)", "(g)", "(h)", "(i)", "(j)", "(k)", "(l)", "(m)", "(n)", "(o)", "(p)", "(q)", "(r)")
@@ -2096,10 +2125,12 @@ mtext(panel[(j+(2*(j-1))+1)], side=3, line=0.5, at=-175, cex=1.3)
 title("Simulated connectivity", line=1, cex.main=2.2)
 
 # Simulated versus empirical
-plot(as.vector(distanceMat.empirical), as.vector(distanceMat.simulatedBR), pch=20, cex=0.8, axes=F, main=NULL, ylab="Simulated", xlab="Empirical", xlim=c(0,7000), ylim=c(0,7000), cex.lab=1.5)
+plot(as.vector(distanceMat.empirical), as.vector(distanceMat.simulatedBR), pch=20, cex=0.8, axes=F, main=NULL, ylab="", xlab="", xlim=c(0,7000), ylim=c(0,7000), cex.lab=1.5)
 axis(side=1)
 axis(side=2)
 abline(lm(as.vector(distanceMat.simulatedBR) ~ as.vector(distanceMat.empirical)), col="red", lwd=2)
+mtext("Empirical", side=1, line=2.3, at=3500, cex=1.2)
+mtext("Simulated", side=2, line=2, at=3500, cex=1.2)
 mtext(panel[(j+(2*(j-1))+2)], side=3, line=0.5, at=-500, cex=1.3)
 mtext(bquote('r'["M"]*' = '* .(round(ORSIM.rM,3))), side=1, line=-1.3, at=5700, cex=1.4)
 title("Simulated vs. empirical", line=1, cex.main=2.2)	
@@ -2229,10 +2260,12 @@ for(j in 2:length(spp_sel)){
 	mtext(panel[(j+(2*(j-1))+1)], side=3, line=0.5, at=-175, cex=1.3)
 
 	# Simulated versus empirical
-	plot(as.vector(distanceMat.empirical), as.vector(distanceMat.simulatedBR), pch=20, cex=0.8, axes=F, main=NULL, ylab="Simulated", xlab="Empirical", xlim=c(0,12000), ylim=c(0,12000), cex.lab=1.5)
+	plot(as.vector(distanceMat.empirical), as.vector(distanceMat.simulatedBR), pch=20, cex=0.8, axes=F, main=NULL, ylab="", xlab="", xlim=c(0,12000), ylim=c(0,12000), cex.lab=1.5)
 	axis(side=1)
 	axis(side=2)
 	abline(lm(as.vector(distanceMat.simulatedBR) ~ as.vector(distanceMat.empirical)), col="red", lwd=2)
+	mtext("Empirical", side=1, line=2.3, at=6000, cex=1.2)
+	mtext("Simulated", side=2, line=2, at=6000, cex=1.2)
 	mtext(panel[(j+(2*(j-1))+2)], side=3, line=0.5, at=-500, cex=1.3)
 	mtext(bquote('r'["M"]*' = '* .(round(ORSIM.rM,3))), side=1, line=-1.3, at=9700, cex=1.4)	
 }
@@ -2389,7 +2422,7 @@ for(j in 1:length(spp_sel1)){
 
 ##  FIGURE S10: species' relative abundance distribution  ##
 
-pdf("Manuscript/Figures/FigS10.pdf", width=9, height=12)
+png("Manuscript/Science/Figures/FigS10b.png", width=900, height=1200, res=100)
 par(mfrow=c(6,4), mar=c(2.2,2.2,1,1), mgp=c(1.3,0.5,0), bg="white")	
 for(j in 1:length(spp_sel1)){
 	
@@ -2420,7 +2453,7 @@ dev.off()
 
 ##  FIGURE S11: simulated site-level migratory connectivity  ##
 
-pdf("Manuscript/Figures/FigS11.pdf", width=9, height=12)
+png("Manuscript/Science/Figures/FigS11b.png", width=900, height=1200, res=100)
 par(mfrow=c(6,4), mar=c(2.2,2.2,1,1), mgp=c(1.3,0.5,0), bg="white")	
 for(j in 1:length(spp_sel1)){
 	
